@@ -2,32 +2,32 @@
 
 Golang Message Dispatcher
 
-![Work flow](https://github.com/fuyibing/gmd/blob/master/docs/work-flow.png)
-
-----
-
-### Script
-
 ```shell
 cd your_path && \
 go build -o gmd && \
 ./gmd start
 ```
 
-### Adapter
+![Work flow](https://github.com/fuyibing/gmd/blob/master/docs/work-flow.png)
 
-MQ Middleware definitions.
+----
 
-1. Aliyun MNS
-2. Rabbit MQ (wait)
-3. Rocket MQ (wait)
+### Supported middleware
 
-### Docker
+1. AliyunMNS
+2. RabbitMQ
+3. RocketMQ
 
-### Utility
+----
 
-1. Export document
-    1. Markdown
-    2. Post man
+### Guide
+
+1. [HTTP API](./docs/api)
+2. Utility
+    1. Export Markdown documents. `go run main.go docs`
+    2. Export Postman collection file. `go run main.go docs -a postman`
+    3. Use docker container
+
+
 
 

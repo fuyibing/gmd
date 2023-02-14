@@ -1,0 +1,16 @@
+# ignore directories.
+.build/
+.docker/
+.git/
+.idea/
+.output/
+
+logs/
+tests/
+
+# category files.
+*.bak
+
+# ignore files.
+go.sum
+

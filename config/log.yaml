@@ -1,0 +1,19 @@
+#
+# package: github.com/fuyibing/log/v3.
+#
+adapter:
+  - "term"
+level: debug
+time: "2006-01-02 15:04:05"
+term:
+  color: true
+file:
+kafka:
+  kafka-topic: "uniondrug-log"
+  kafka-brokers:
+    - "192.168.3.131:9092"
+redis:
+  addr: "192.168.3.133:6379"
+  password: ""
+  max-active: 4
+  max-idle: 2

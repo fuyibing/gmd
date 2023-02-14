@@ -1,0 +1,11 @@
+adapter: "aliyunmns"
+account:
+  aliyunmns:
+    access-id: "LTAIjxpFrti0RuRv"
+    access-key: "7hq4X9uid7T401hp5WnjzqrFqEnILK"
+    endpoint: "http://1883677246363726.mns.cn-shanghai.aliyuncs.com/"
+    prefix: "X-"
+consumer:
+producer:
+
+

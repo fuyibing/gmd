@@ -1,0 +1,33 @@
+#
+# package: github.com/fuyibing/db/v3.
+# path: config/db.yaml
+#
+# databases:
+#   db:
+#     driver: "mysql"             # default: mysql
+#     mapper: "snake"             # default: snake
+#     enable-session: true        # default: true
+#     show-sql: true              # default: true
+#     max-idle: 1                 # default: 2
+#     max-open: 10                # default: 30
+#     max-lifetime: 30            # default: 60
+#     dsn:                        # required
+#       - "root:pass@tcp(127.0.0.1:3306)/test?charset=utf8"
+#       - "root:pass@tcp(127.0.0.1:3306)/test?charset=utf8"
+#   db1:
+#     dsn:
+#       - "root11:pass@tcp(127.0.0.1:3306)/test?charset=utf8"
+#       - "root12:pass@tcp(127.0.0.1:3306)/test?charset=utf8"
+#   db2:
+#     dsn:
+#       - "root21:pass@tcp(127.0.0.1:3306)/test?charset=utf8"
+#       - "root22:pass@tcp(127.0.0.1:3306)/test?charset=utf8"
+# max-idle: 2
+# max-open: 32
+# max-lifetime: 60
+# mapper: "snake"
+#
+databases:
+  db:
+    dsn:
+      - "root:pass@tcp(127.0.0.1:3306)/mbs?charset=utf8"

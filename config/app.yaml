@@ -1,0 +1,9 @@
+host: "0.0.0.0"
+name: "gmd"
+port: 8101
+version: "1.0"
+consul: false
+consul-addr: "udsdk.turboradio.cn"
+consul-scheme: "http"
+consul-service-addr: "gmd.example.com"
+consul-service-port: 9876

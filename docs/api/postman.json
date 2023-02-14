@@ -1,0 +1,754 @@
+{
+    "info": {
+        "_postman_id": "d85caf59-2303-040f-96ab95bac6c52be2",
+        "description": "Message Dispatcher by golang",
+        "name": "GMD",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Default",
+            "item": [
+                {
+                    "name": "Health checker",
+                    "request": {
+                        "description": "",
+                        "method": "GET",
+                        "url": {
+                            "host": [
+                                "gmd.{{domain}}:8101"
+                            ],
+                            "path": [
+                                "",
+                                "ping"
+                            ],
+                            "protocol": "http",
+                            "raw": "http://gmd.{{domain}}:8101//ping"
+                        }
+                    },
+                    "response": [
+                        {
+                            "name": "Response #1",
+                            "originalRequest": {
+                                "description": "",
+                                "method": "GET",
+                                "url": {
+                                    "host": [
+                                        "gmd.{{domain}}:8101"
+                                    ],
+                                    "path": [
+                                        "",
+                                        "ping"
+                                    ],
+                                    "protocol": "http",
+                                    "raw": "http://gmd.{{domain}}:8101//ping"
+                                }
+                            },
+                            "_postman_previewlanguage": "json",
+                            "body": "{\n    \"cpu\": 8,\n    \"goroutines\": 32,\n    \"memory\": 16.57,\n    \"pid\": 3721,\n    \"start_time\": \"2022-01-19 14:21:25\"\n}"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Task",
+            "item": [
+                {
+                    "name": "Add new",
+                    "request": {
+                        "description": "",
+                        "method": "POST",
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"delay_seconds\": 0,\n    \"handler\": \"https://example.com/orders/expired/remove\",\n    \"remark\": \"任务备注\",\n    \"title\": \"任务名称\",\n    \"topic_name\": \"orders\",\n    \"topic_tag\": \"created\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "gmd.{{domain}}:8101"
+                            ],
+                            "path": [
+                                "",
+                                "task",
+                                "add"
+                            ],
+                            "protocol": "http",
+                            "raw": "http://gmd.{{domain}}:8101//task/add"
+                        }
+                    },
+                    "response": [
+                        {
+                            "name": "Response #1",
+                            "originalRequest": {
+                                "description": "",
+                                "method": "POST",
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"delay_seconds\": 0,\n    \"handler\": \"https://example.com/orders/expired/remove\",\n    \"remark\": \"任务备注\",\n    \"title\": \"任务名称\",\n    \"topic_name\": \"orders\",\n    \"topic_tag\": \"created\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "host": [
+                                        "gmd.{{domain}}:8101"
+                                    ],
+                                    "path": [
+                                        "",
+                                        "task",
+                                        "add"
+                                    ],
+                                    "protocol": "http",
+                                    "raw": "http://gmd.{{domain}}:8101//task/add"
+                                }
+                            },
+                            "_postman_previewlanguage": "json",
+                            "body": "{\n    \"delay_seconds\": 0,\n    \"id\": 1,\n    \"title\": \"任务名称\",\n    \"topic_name\": \"orders\",\n    \"topic_tag\": \"created\"\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Delete",
+                    "request": {
+                        "description": "",
+                        "method": "POST",
+                        "url": {
+                            "host": [
+                                "gmd.{{domain}}:8101"
+                            ],
+                            "path": [
+                                "",
+                                "task",
+                                "del"
+                            ],
+                            "protocol": "http",
+                            "raw": "http://gmd.{{domain}}:8101//task/del"
+                        }
+                    }
+                },
+                {
+                    "name": "Disable",
+                    "request": {
+                        "description": "",
+                        "method": "POST",
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"id\": 1\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "gmd.{{domain}}:8101"
+                            ],
+                            "path": [
+                                "",
+                                "task",
+                                "disable"
+                            ],
+                            "protocol": "http",
+                            "raw": "http://gmd.{{domain}}:8101//task/disable"
+                        }
+                    },
+                    "response": [
+                        {
+                            "name": "Response #1",
+                            "originalRequest": {
+                                "description": "",
+                                "method": "POST",
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"id\": 1\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "host": [
+                                        "gmd.{{domain}}:8101"
+                                    ],
+                                    "path": [
+                                        "",
+                                        "task",
+                                        "disable"
+                                    ],
+                                    "protocol": "http",
+                                    "raw": "http://gmd.{{domain}}:8101//task/disable"
+                                }
+                            },
+                            "_postman_previewlanguage": "json",
+                            "body": "{\n    \"affects\": 1,\n    \"id\": 1,\n    \"title\": \"任务名称\"\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Edit failed notification handler",
+                    "request": {
+                        "description": "When message consumption fails, forward the last delivery result\nto the failed callback",
+                        "method": "POST",
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"condition\": \"\",\n    \"handler\": \"http://example.com/path/route?key=value\",\n    \"id\": 1,\n    \"ignore_codes\": \"1234,1234\",\n    \"method\": \"\",\n    \"response_type\": 0,\n    \"timeout\": 10\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "gmd.{{domain}}:8101"
+                            ],
+                            "path": [
+                                "",
+                                "task",
+                                "edit",
+                                "failed"
+                            ],
+                            "protocol": "http",
+                            "raw": "http://gmd.{{domain}}:8101//task/edit/failed"
+                        }
+                    },
+                    "response": [
+                        {
+                            "name": "Response #1",
+                            "originalRequest": {
+                                "description": "When message consumption fails, forward the last delivery result\nto the failed callback",
+                                "method": "POST",
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"condition\": \"\",\n    \"handler\": \"http://example.com/path/route?key=value\",\n    \"id\": 1,\n    \"ignore_codes\": \"1234,1234\",\n    \"method\": \"\",\n    \"response_type\": 0,\n    \"timeout\": 10\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "host": [
+                                        "gmd.{{domain}}:8101"
+                                    ],
+                                    "path": [
+                                        "",
+                                        "task",
+                                        "edit",
+                                        "failed"
+                                    ],
+                                    "protocol": "http",
+                                    "raw": "http://gmd.{{domain}}:8101//task/edit/failed"
+                                }
+                            },
+                            "_postman_previewlanguage": "json",
+                            "body": "{\n    \"affects\": 1,\n    \"id\": 1,\n    \"title\": \"任务名称\"\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Edit subscriber handler",
+                    "request": {
+                        "description": "When the consumer receives the message, it will be delivered to the\nspecified callback",
+                        "method": "POST",
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"condition\": \"\",\n    \"handler\": \"http://example.com/path/route?key=value\",\n    \"id\": 1,\n    \"ignore_codes\": \"1234,1234\",\n    \"method\": \"\",\n    \"response_type\": 0,\n    \"timeout\": 10\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "gmd.{{domain}}:8101"
+                            ],
+                            "path": [
+                                "",
+                                "task",
+                                "edit",
+                                "handler"
+                            ],
+                            "protocol": "http",
+                            "raw": "http://gmd.{{domain}}:8101//task/edit/handler"
+                        }
+                    },
+                    "response": [
+                        {
+                            "name": "Response #1",
+                            "originalRequest": {
+                                "description": "When the consumer receives the message, it will be delivered to the\nspecified callback",
+                                "method": "POST",
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"condition\": \"\",\n    \"handler\": \"http://example.com/path/route?key=value\",\n    \"id\": 1,\n    \"ignore_codes\": \"1234,1234\",\n    \"method\": \"\",\n    \"response_type\": 0,\n    \"timeout\": 10\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "host": [
+                                        "gmd.{{domain}}:8101"
+                                    ],
+                                    "path": [
+                                        "",
+                                        "task",
+                                        "edit",
+                                        "handler"
+                                    ],
+                                    "protocol": "http",
+                                    "raw": "http://gmd.{{domain}}:8101//task/edit/handler"
+                                }
+                            },
+                            "_postman_previewlanguage": "json",
+                            "body": "{\n    \"affects\": 1,\n    \"id\": 1,\n    \"title\": \"任务名称\"\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Edit succeed notification handler",
+                    "request": {
+                        "description": "When the message consumption is successful, forward the delivery\nresult to the successful callback",
+                        "method": "POST",
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"condition\": \"\",\n    \"handler\": \"http://example.com/path/route?key=value\",\n    \"id\": 1,\n    \"ignore_codes\": \"1234,1234\",\n    \"method\": \"\",\n    \"response_type\": 0,\n    \"timeout\": 10\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "gmd.{{domain}}:8101"
+                            ],
+                            "path": [
+                                "",
+                                "task",
+                                "edit",
+                                "succeed"
+                            ],
+                            "protocol": "http",
+                            "raw": "http://gmd.{{domain}}:8101//task/edit/succeed"
+                        }
+                    },
+                    "response": [
+                        {
+                            "name": "Response #1",
+                            "originalRequest": {
+                                "description": "When the message consumption is successful, forward the delivery\nresult to the successful callback",
+                                "method": "POST",
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"condition\": \"\",\n    \"handler\": \"http://example.com/path/route?key=value\",\n    \"id\": 1,\n    \"ignore_codes\": \"1234,1234\",\n    \"method\": \"\",\n    \"response_type\": 0,\n    \"timeout\": 10\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "host": [
+                                        "gmd.{{domain}}:8101"
+                                    ],
+                                    "path": [
+                                        "",
+                                        "task",
+                                        "edit",
+                                        "succeed"
+                                    ],
+                                    "protocol": "http",
+                                    "raw": "http://gmd.{{domain}}:8101//task/edit/succeed"
+                                }
+                            },
+                            "_postman_previewlanguage": "json",
+                            "body": "{\n    \"affects\": 1,\n    \"id\": 1,\n    \"title\": \"任务名称\"\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Edit basic",
+                    "request": {
+                        "description": "",
+                        "method": "POST",
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"broadcasting\": 0,\n    \"concurrency\": 10,\n    \"delay_seconds\": 0,\n    \"id\": 1,\n    \"max_retry\": 3,\n    \"parallels\": 1,\n    \"remark\": \"任务备注\",\n    \"title\": \"任务名称\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "gmd.{{domain}}:8101"
+                            ],
+                            "path": [
+                                "",
+                                "task",
+                                "edit"
+                            ],
+                            "protocol": "http",
+                            "raw": "http://gmd.{{domain}}:8101//task/edit"
+                        }
+                    },
+                    "response": [
+                        {
+                            "name": "Response #1",
+                            "originalRequest": {
+                                "description": "",
+                                "method": "POST",
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"broadcasting\": 0,\n    \"concurrency\": 10,\n    \"delay_seconds\": 0,\n    \"id\": 1,\n    \"max_retry\": 3,\n    \"parallels\": 1,\n    \"remark\": \"任务备注\",\n    \"title\": \"任务名称\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "host": [
+                                        "gmd.{{domain}}:8101"
+                                    ],
+                                    "path": [
+                                        "",
+                                        "task",
+                                        "edit"
+                                    ],
+                                    "protocol": "http",
+                                    "raw": "http://gmd.{{domain}}:8101//task/edit"
+                                }
+                            },
+                            "_postman_previewlanguage": "json",
+                            "body": "{\n    \"affects\": 1,\n    \"id\": 1,\n    \"title\": \"任务名称\"\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Enable",
+                    "request": {
+                        "description": "",
+                        "method": "POST",
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"id\": 1\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "gmd.{{domain}}:8101"
+                            ],
+                            "path": [
+                                "",
+                                "task",
+                                "enable"
+                            ],
+                            "protocol": "http",
+                            "raw": "http://gmd.{{domain}}:8101//task/enable"
+                        }
+                    },
+                    "response": [
+                        {
+                            "name": "Response #1",
+                            "originalRequest": {
+                                "description": "",
+                                "method": "POST",
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"id\": 1\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "host": [
+                                        "gmd.{{domain}}:8101"
+                                    ],
+                                    "path": [
+                                        "",
+                                        "task",
+                                        "enable"
+                                    ],
+                                    "protocol": "http",
+                                    "raw": "http://gmd.{{domain}}:8101//task/enable"
+                                }
+                            },
+                            "_postman_previewlanguage": "json",
+                            "body": "{\n    \"affects\": 1,\n    \"id\": 1,\n    \"title\": \"任务名称\"\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Build remote relations",
+                    "request": {
+                        "description": "",
+                        "method": "POST",
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"id\": 1\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "gmd.{{domain}}:8101"
+                            ],
+                            "path": [
+                                "",
+                                "task",
+                                "remote",
+                                "build"
+                            ],
+                            "protocol": "http",
+                            "raw": "http://gmd.{{domain}}:8101//task/remote/build"
+                        }
+                    },
+                    "response": [
+                        {
+                            "name": "Response #1",
+                            "originalRequest": {
+                                "description": "",
+                                "method": "POST",
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"id\": 1\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "host": [
+                                        "gmd.{{domain}}:8101"
+                                    ],
+                                    "path": [
+                                        "",
+                                        "task",
+                                        "remote",
+                                        "build"
+                                    ],
+                                    "protocol": "http",
+                                    "raw": "http://gmd.{{domain}}:8101//task/remote/build"
+                                }
+                            },
+                            "_postman_previewlanguage": "json",
+                            "body": "{\n    \"id\": 1,\n    \"title\": \"任务名称\"\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Destroy remote relations",
+                    "request": {
+                        "description": "",
+                        "method": "POST",
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"id\": 1\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "gmd.{{domain}}:8101"
+                            ],
+                            "path": [
+                                "",
+                                "task",
+                                "remote",
+                                "destroy"
+                            ],
+                            "protocol": "http",
+                            "raw": "http://gmd.{{domain}}:8101//task/remote/destroy"
+                        }
+                    },
+                    "response": [
+                        {
+                            "name": "Response #1",
+                            "originalRequest": {
+                                "description": "",
+                                "method": "POST",
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"id\": 1\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "host": [
+                                        "gmd.{{domain}}:8101"
+                                    ],
+                                    "path": [
+                                        "",
+                                        "task",
+                                        "remote",
+                                        "destroy"
+                                    ],
+                                    "protocol": "http",
+                                    "raw": "http://gmd.{{domain}}:8101//task/remote/destroy"
+                                }
+                            },
+                            "_postman_previewlanguage": "json",
+                            "body": "{\n    \"id\": 1,\n    \"title\": \"任务名称\"\n}"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Topic",
+            "item": [
+                {
+                    "name": "Publish batch messages",
+                    "request": {
+                        "description": "Each request can publish multiple messages, up to 100\nAsynchronous mode",
+                        "method": "POST",
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"messages\": [\n        \"*\"\n    ],\n    \"topic_name\": \"\",\n    \"topic_tag\": \"\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "gmd.{{domain}}:8101"
+                            ],
+                            "path": [
+                                "",
+                                "topic",
+                                "batch"
+                            ],
+                            "protocol": "http",
+                            "raw": "http://gmd.{{domain}}:8101//topic/batch"
+                        }
+                    },
+                    "response": [
+                        {
+                            "name": "Response #1",
+                            "originalRequest": {
+                                "description": "Each request can publish multiple messages, up to 100\nAsynchronous mode",
+                                "method": "POST",
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"messages\": [\n        \"*\"\n    ],\n    \"topic_name\": \"\",\n    \"topic_tag\": \"\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "host": [
+                                        "gmd.{{domain}}:8101"
+                                    ],
+                                    "path": [
+                                        "",
+                                        "topic",
+                                        "batch"
+                                    ],
+                                    "protocol": "http",
+                                    "raw": "http://gmd.{{domain}}:8101//topic/batch"
+                                }
+                            },
+                            "_postman_previewlanguage": "json",
+                            "body": "{\n    \"count\": 3,\n    \"hash\": \"C0837A1B5E264F19826F31457D51546D\",\n    \"registry_id\": 1\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Publish one message",
+                    "request": {
+                        "description": "Only 1 message can be published per request\nAsynchronous mode",
+                        "method": "POST",
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"message\": \"*\",\n    \"topic_name\": \"\",\n    \"topic_tag\": \"\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "host": [
+                                "gmd.{{domain}}:8101"
+                            ],
+                            "path": [
+                                "",
+                                "topic",
+                                "publish"
+                            ],
+                            "protocol": "http",
+                            "raw": "http://gmd.{{domain}}:8101//topic/publish"
+                        }
+                    },
+                    "response": [
+                        {
+                            "name": "Response #1",
+                            "originalRequest": {
+                                "description": "Only 1 message can be published per request\nAsynchronous mode",
+                                "method": "POST",
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n    \"message\": \"*\",\n    \"topic_name\": \"\",\n    \"topic_tag\": \"\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "host": [
+                                        "gmd.{{domain}}:8101"
+                                    ],
+                                    "path": [
+                                        "",
+                                        "topic",
+                                        "publish"
+                                    ],
+                                    "protocol": "http",
+                                    "raw": "http://gmd.{{domain}}:8101//topic/publish"
+                                }
+                            },
+                            "_postman_previewlanguage": "json",
+                            "body": "{\n    \"hash\": \"c0837a1b5e264f19826f31457d51546d\",\n    \"registry_id\": 1\n}"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

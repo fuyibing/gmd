@@ -13,8 +13,6 @@ import (
 )
 
 type (
-	// RemoterManager
-	// interface of remoter manager.
 	RemoterManager interface {
 		// Adapter
 		// return remoter adapter interface.
@@ -121,16 +119,11 @@ func (o *remoter) OnPanic(ctx context.Context, v interface{}) {
 }
 
 // /////////////////////////////////////////////////////////////
-// Actions methods.
-// /////////////////////////////////////////////////////////////
-
-// /////////////////////////////////////////////////////////////
 // Constructor methods.
 // /////////////////////////////////////////////////////////////
 
 func (o *remoter) init() *remoter {
-	// Create
-	// processor instance.
+	// Register remoter processor event callbacks.
 	o.processor = process.New("remoter manager").After(
 		o.OnAfter,
 	).Before(

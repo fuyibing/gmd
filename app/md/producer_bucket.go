@@ -10,8 +10,6 @@ import (
 )
 
 type (
-	// ProducerBucket
-	// interface of producer bucket.
 	ProducerBucket interface {
 		// IsEmpty
 		// return bucket is empty or not.

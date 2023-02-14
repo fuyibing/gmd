@@ -12,8 +12,6 @@ import (
 )
 
 type (
-	// ConsumerManager
-	// instance of consumer manager.
 	ConsumerManager interface {
 		// Container
 		// return consumer container interface.
@@ -152,12 +150,10 @@ func (o *consumer) sendReload() {
 // /////////////////////////////////////////////////////////////
 
 func (o *consumer) init() *consumer {
-	// Create
-	// container instance.
+	// Prepare consumer container.
 	o.container = (&container{}).init()
 
-	// Create
-	// processor instance.
+	// Register consumer processor event callbacks.
 	o.processor = process.New("consumer manager").After(
 		o.OnAfter,
 	).Before(

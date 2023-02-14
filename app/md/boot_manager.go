@@ -12,15 +12,9 @@ import (
 	"time"
 )
 
-var (
-	// Boot
-	// instance of boot manager.
-	Boot BootManager
-)
+var Boot BootManager
 
 type (
-	// BootManager
-	// interface of boot manager.
 	BootManager interface {
 		// Consumer
 		// return consumer manager interface.
@@ -100,11 +94,11 @@ func (o *boot) OnBefore(_ context.Context) (ignored bool) {
 // OnBeforeLoadMemory
 // call memory manager reload.
 func (o *boot) OnBeforeLoadMemory(_ context.Context) (ignored bool) {
-	log.Debugf("boot manager: call memory manager reload")
-
-	// Call
-	// memory manager reload.
+	// Load memory for the first time.
+	// The consumer and producer manager needs this data.
+	log.Debugf("boot manager: load memory for the first time")
 	if err := base.Memory.Reload(); err != nil {
+		log.Errorf("boot manager: memory load failed, error=%v", err)
 		return true
 	}
 
@@ -129,7 +123,7 @@ func (o *boot) OnCallChannel(ctx context.Context) (ignored bool) {
 // OnCallChildStart
 // start child processors in coroutine.
 func (o *boot) OnCallChildStart(ctx context.Context) (ignored bool) {
-	log.Debugf("boot manager: start child processors in coroutine")
+	log.Debugf("boot manager: start %d child processors in coroutine", len(o.children))
 
 	// Start
 	// child processors in coroutine.
@@ -158,7 +152,7 @@ func (o *boot) OnCallChildStopped(ctx context.Context) (ignored bool) {
 
 	// Next
 	// event callee.
-	log.Debugf("boot manager: child processors stopped")
+	log.Debugf("boot manager: %d child processors stopped", len(o.children))
 	return
 }
 
@@ -173,8 +167,7 @@ func (o *boot) OnPanic(ctx context.Context, v interface{}) {
 // /////////////////////////////////////////////////////////////
 
 func (o *boot) init() *boot {
-	// Create
-	// child manager instances.
+	// Prepare child managers.
 	o.consumer = (&consumer{}).init()
 	o.producer = (&producer{}).init()
 	o.retry = (&retry{}).init()
@@ -188,8 +181,7 @@ func (o *boot) init() *boot {
 		o.remoter.Processor(),
 	}
 
-	// Create
-	// processor instance.
+	// Register boot processor event callbacks.
 	o.processor = process.New("boot manager").After(
 		o.OnAfter,
 	).Before(

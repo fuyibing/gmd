@@ -19,8 +19,6 @@ import (
 )
 
 type (
-	// ConsumerWorker
-	// instance of consumer worker.
 	ConsumerWorker interface {
 		// Do
 		// worker process.

@@ -29,8 +29,6 @@ const (
 )
 
 type (
-	// RetryManager
-	// interface of retry manager.
 	RetryManager interface {
 		// Message
 		// read waiting messages in database then call consume.
@@ -504,8 +502,7 @@ func (o *retry) lockUnset(kind RetryKind) {
 func (o *retry) init() *retry {
 	o.mu = &sync.RWMutex{}
 
-	// Create
-	// processor instance.
+	// Register retry processor event callbacks.
 	o.processor = process.New("retry manager").After(
 		o.OnAfter,
 	).Before(

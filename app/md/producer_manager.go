@@ -17,8 +17,6 @@ import (
 )
 
 type (
-	// ProducerManager
-	// instance of producer manager.
 	ProducerManager interface {
 		// Bucket
 		// return producer bucket interface.
@@ -74,11 +72,11 @@ func (o *producer) OnAfter(_ context.Context) (ignored bool) {
 // clean bucket.
 func (o *producer) OnAfterClean(ctx context.Context) (ignored bool) {
 	// Pop
-	// 100 messages.
-	if s, n := o.bucket.Popn(100); n > 0 {
+	// 30 messages.
+	if s, n := o.bucket.Popn(30); n > 0 {
 		e := fmt.Errorf("clean bucket")
 		w := &sync.WaitGroup{}
-		log.Debugf("producer manager: producer bucket clean %d items", n)
+		log.Debugf("producer manager: producer bucket clean %d payloads", n)
 
 		// Release
 		// with parallel.
@@ -386,12 +384,10 @@ func (o *producer) rePop(ctx context.Context) {
 // /////////////////////////////////////////////////////////////
 
 func (o *producer) init() *producer {
-	// Create
-	// bucket instance.
+	// Prepare producer bucket.
 	o.bucket = (&bucket{size: conf.Config.Producer.BucketSize}).init()
 
-	// Create
-	// processor instance.
+	// Register producer processor event callbacks.
 	o.processor = process.New("producer manager").After(
 		o.OnAfterClean,
 		o.OnAfterIdle,

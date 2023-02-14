@@ -14,8 +14,6 @@ import (
 )
 
 type (
-	// ConsumerContainer
-	// interface of consumer container.
 	ConsumerContainer interface {
 		// Flush
 		// start adapter if not started. Stop adapter if task

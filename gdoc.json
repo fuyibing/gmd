@@ -1,6 +1,6 @@
 {
   "name": "GMD",
-  "description": "Message Dispatcher by golang",
+  "description": "MQ Dispatcher by golang",
   "deploy": {
     "host": "gmd.{{domain}}",
     "port": 8101

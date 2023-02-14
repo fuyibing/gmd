@@ -1,9 +1,14 @@
 # GMD
 
-Golang Message Dispatcher
+Any application can publish messages as a producer, Any application can be used as
+consumer consumption message. GMD maintains the subscription relationship of MQ, When
+there is a message in the queue, GMD will deliver the message to the subscribers of
+any application.
 
 ```shell
-cd your_path && \
+cd your_empty_path && \
+git clone https://github.com/fuyibing/gmd.git . && \
+go mod tidy && \
 go build -o gmd && \
 ./gmd start
 ```

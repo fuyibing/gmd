@@ -1,8 +1,12 @@
 // author: wsfuyibing <websearch@163.com>
 // date: 2023-02-01
 
-// Package main
-// Message dispatcher application.
+// GMD (Go MQ dispatcher)
+//
+// Any application can publish messages as a producer, Any application
+// can be used as consumer consumption message. GMD maintains the
+// subscription relationship of MQ, When there is a message in the queue,
+// GMD will deliver the message to the subscribers of any application.
 package main
 
 import (
@@ -54,7 +58,7 @@ func (o *Bootstrap) DoBefore(_ *iris.Application) {
 // DoInterrupt
 //
 // called when SIGTERM/SIGINT signal received. Block coroutine
-// until message dispatcher boot manager stopped.
+// until mq dispatcher boot manager stopped.
 func (o *Bootstrap) DoInterrupt() {
 	// Cancel context
 	// if it is running.
@@ -63,7 +67,7 @@ func (o *Bootstrap) DoInterrupt() {
 	}
 
 	// Block process
-	// until message dispatcher boot stopped.
+	// until mq dispatcher boot stopped.
 	for {
 		if md.Boot.Processor().Stopped() {
 			break
@@ -165,7 +169,7 @@ func (o *Bootstrap) InitFrameworkStatusCode() {
 // called by console manager.
 func (o *Bootstrap) Run(_ managers.Manager, _ managers.Arguments) error {
 	// Context definitions
-	// for message dispatcher boot manager.
+	// for mq dispatcher boot manager.
 	o.ctx, o.cancel = context.WithCancel(context.Background())
 
 	// Clean called

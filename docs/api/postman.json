@@ -1,7 +1,7 @@
 {
     "info": {
         "_postman_id": "d85caf59-2303-040f-96ab95bac6c52be2",
-        "description": "Message Dispatcher by golang",
+        "description": "MQ Dispatcher by golang",
         "name": "GMD",
         "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
     },

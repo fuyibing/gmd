@@ -1,9 +1,7 @@
 # ignore directories.
-.build/
-.docker/
+
 .git/
 .idea/
-.output/
 
 logs/
 tests/

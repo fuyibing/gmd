@@ -2,7 +2,7 @@
 
 **Host** : `http://gmd.{{domain}}:8101`<br />**Updated** : `2023-02-02 12:22`
 
-> Message Dispatcher by golang
+> MQ Dispatcher by golang
 
 ### Table Contents
 

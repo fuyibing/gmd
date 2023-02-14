@@ -2,7 +2,7 @@
 // date: 2023-02-08
 
 // Package md
-// Core library for message dispatcher.
+// Core library for mq dispatcher.
 package md
 
 import (

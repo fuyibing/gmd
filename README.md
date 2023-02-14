@@ -2,7 +2,7 @@
 
 Golang Message Dispatcher
 
-![Work flow](./docs/work-flow.png)
+![Work flow](https://github.com/fuyibing/gmd/blob/master/docs/work-flow.png)
 
 ----
 

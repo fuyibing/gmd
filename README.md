@@ -1,5 +1,8 @@
 # GMD
 
-Golang Message Dispatcher 
+Golang Message Dispatcher
+
+![Work flow](./docs/work-flow.png)
+
 
 

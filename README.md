@@ -1,7 +1,5 @@
 # GMD
 
-----
-
 Golang Message Dispatcher
 
 ![Work flow](./docs/work-flow.png)
@@ -23,8 +21,6 @@ MQ Middleware definitions.
 1. Aliyun MNS
 2. Rabbit MQ (wait)
 3. Rocket MQ (wait)
-
-
 
 ### Docker
 

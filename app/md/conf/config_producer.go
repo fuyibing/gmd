@@ -37,6 +37,8 @@ type (
 		// 默认: 5
 		MaxRetry int `yaml:"max-retry" json:"max-retry"`
 
+		PublishTimeout int `yaml:"publish-timeout" json:"publish-timeout"`
+
 		NotificationTagFailed  string `yaml:"notification-tag-failed" json:"notification-tag-failed"`
 		NotificationTagSucceed string `yaml:"notification-tag-succeed" json:"notification-tag-succeed"`
 		NotificationTopic      string `yaml:"notification-topic" json:"notification-topic"`
@@ -66,6 +68,10 @@ func (o *ProducerConfig) initDefaults() {
 
 	if o.MaxRetry == 0 {
 		o.MaxRetry = 5
+	}
+
+	if o.PublishTimeout == 0 {
+		o.PublishTimeout = 3
 	}
 
 	if o.StorePublishFailed == nil {

@@ -201,6 +201,7 @@ func (o *worker) dispatchHttp(c context.Context, t *base.Task, m *base.Message, 
 
 	// Set user agent.
 	x.Request.Header.SetUserAgent(app.Config.Software)
+	x.Request.Header.SetContentType("application/json")
 
 	// Set headers
 	// with message properties.

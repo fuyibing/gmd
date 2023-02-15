@@ -1,10 +1,17 @@
-adapter: "aliyunmns"
+adapter: "rocketmq"
 account:
   aliyunmns:
-    access-id: "YOUR_ACCESS_ID"
-    access-key: "YOUR_ACCESS_KEY"
-    endpoint: "http://YOUR_ID.mns.cn-shanghai.aliyuncs.com/"
+    access-id: "KEY"
+    access-key: "SEC"
+    endpoint: "http://yourid.mns.cn-shanghai.aliyuncs.com/"
     prefix: "X-"
+  rocketmq:
+    servers:
+      - "127.0.0.1:9876"
+    brokers:
+      - "127.0.0.1:10911"
+    prefix: "X-"
+    topic-template: "TBW102"
 consumer:
 producer:
 

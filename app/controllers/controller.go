@@ -6,8 +6,10 @@
 package controllers
 
 import (
+	"encoding/json"
 	"github.com/fuyibing/gmd/app/logics"
 	"github.com/fuyibing/gmd/app/logics/index"
+	"github.com/fuyibing/util/v2/web/response"
 	"github.com/kataras/iris/v12"
 )
 
@@ -30,4 +32,23 @@ func (o *Controller) Get(i iris.Context) interface{} {
 // @Response(app/logics/index.PingResponse)
 func (o *Controller) GetPing(i iris.Context) interface{} {
 	return logics.New(i, index.NewPing().Run)
+}
+
+// PostConsume
+// Example consume.
+//
+// @Ignore(true)
+// todo : debug for self consumed.
+func (o *Controller) PostConsume(i iris.Context) interface{} {
+	data := make(map[string]interface{})
+
+	if b, be := json.Marshal(i.Request().Header); be == nil {
+		data["header"] = string(b)
+	}
+
+	if b, be := i.GetBody(); be == nil {
+		data["payload"] = string(b)
+	}
+
+	return response.With.Data(data)
 }

@@ -127,7 +127,7 @@ func (o *Received) doConsume(m *primitive.MessageExt) (consumer.ConsumeResult, e
 		currTime       = time.Now().UnixMilli()
 		diffTime       int64
 		consumeTimes   = int(m.ReconsumeTimes + 1)
-		brokers        string
+		information    = ""
 	)
 
 	// Parse topic message id.
@@ -142,27 +142,38 @@ func (o *Received) doConsume(m *primitive.MessageExt) (consumer.ConsumeResult, e
 		}
 	}
 
-	// Execute real delay time.
 	diffTime = currTime - bornTime
 
-	if m.Queue != nil {
-		brokers = m.Queue.String()
-	}
-
-	log.Infofc(ctx, "%s: message received %s, "+
-		"consume-times=%d, topic-message-id=%s, message-id=%s, message-tag=%s, "+
-		"delay-expected=%d ms, delay-really=%d ms",
-		o.name, brokers,
-		consumeTimes, topicMessageId, m.MsgId, m.Message.GetTags(),
+	// Info: message + topic + delay time.
+	information += fmt.Sprintf("message received, Message {Dequeue=%d, MessageId=%s, MessageTag=%s}",
+		consumeTimes, m.MsgId, m.GetTags(),
+	) + fmt.Sprintf(", Topic {Name=%s, MessageId=%s}",
+		m.Topic, topicMessageId,
+	) + fmt.Sprintf(", DelayTime {Expected=%v, Really=%v}",
 		o.delayerMilliSeconds, diffTime,
 	)
 
+	if m.Queue != nil {
+		information += fmt.Sprintf(", Queue {Queue=%d, broker=%s}",
+			m.Queue.QueueId, m.Queue.BrokerName,
+		)
+	}
+
+	// Info: logger trace.
+	log.Infofc(ctx, "%s: %s", o.name, information)
+
+	// Acquire message instance.
 	msg = base.Pool.AcquireMessage().SetContext(ctx)
 	msg.Dequeue = consumeTimes
 	msg.MessageId = m.MsgId
 	msg.MessageTime = bornTime
 	msg.MessageBody = string(m.Body)
 	msg.PayloadMessageId = topicMessageId
+
+	// Keyword trace.
+	if k := m.GetKeys(); k != "" {
+		msg.Keyword = k
+	}
 
 	// Call dispatcher.
 	if retry := o.dispatcher(o.task, msg); retry {
@@ -178,8 +189,8 @@ func (o *Received) doConsume(m *primitive.MessageExt) (consumer.ConsumeResult, e
 func (o *Received) doPublish(ctx context.Context, m *primitive.MessageExt, bt int64, seconds, level int) (consumer.ConsumeResult, error) {
 	var (
 		bornTime       = fmt.Sprintf("%v", bt)
-		brokers        string
 		err            error
+		information    = ""
 		messageId      string
 		publishCount   = "1"
 		topicMessageId = m.MsgId
@@ -197,6 +208,16 @@ func (o *Received) doPublish(ctx context.Context, m *primitive.MessageExt, bt in
 		}
 	}
 
+	information += fmt.Sprintf("message publish delay, Message {Dequeue=%d, MessageId=%s, MessageTag=%s}",
+		m.ReconsumeTimes+1, m.MsgId, m.GetTags(),
+	) + fmt.Sprintf(", Topic {Name=%s, MessageId=%s}",
+		m.Topic, topicMessageId,
+	) + fmt.Sprintf(", Target {Topic=%s, MessageTag=%s}",
+		o.topic, o.delayerTag,
+	) + fmt.Sprintf(", DelayTime {Publish=%v, Seconds=%d, Level=%d}",
+		publishCount, seconds, level,
+	)
+
 	// Generate message param.
 	x := &primitive.Message{Topic: o.topic, Body: m.Body}
 	x.WithProperty(DefaultDelayPublishCount, publishCount)
@@ -205,30 +226,19 @@ func (o *Received) doPublish(ctx context.Context, m *primitive.MessageExt, bt in
 	x.WithTag(o.delayerTag)
 	x.WithDelayTimeLevel(level)
 
-	if m.Queue != nil {
-		brokers = m.Queue.String()
+	// Copy key.
+	if k := m.GetKeys(); k != "" {
+		x.WithKeys([]string{k})
 	}
 
 	// Delay message publish failed.
 	if messageId, err = defaultProducer.doSend(ctx, x); err != nil {
-		log.Errorf("%s: delay message publish failed %s, "+
-			"consume-times=%d, topic-message-id=%s, current-message-id=%s, message-id=%s, topic-tag=%s, "+
-			"delay-seconds=%d, delay-level=%d, error=%v",
-			o.name, brokers,
-			m.ReconsumeTimes+1, topicMessageId, m.MsgId, messageId, m.Message.GetTags(),
-			seconds, level, err,
-		)
+		log.Errorf("%s: %s, error=%v", o.name, information, err)
 		return consumer.ConsumeRetryLater, nil
 	}
 
 	// Delay message published.
-	log.Infof("%s: delay message published %s, "+
-		"consume-times=%d, topic-message-id=%s, current-message-id=%s, message-id=%s, topic-tag=%s, "+
-		"delay-seconds=%d, delay-level=%d, publish-count=%s",
-		o.name, brokers,
-		m.ReconsumeTimes+1, topicMessageId, m.MsgId, messageId, m.Message.GetTags(),
-		seconds, level, publishCount,
-	)
+	log.Infof("%s: %s, Target {MessageId=%s}", o.name, information, messageId)
 	return consumer.ConsumeSuccess, nil
 }
 

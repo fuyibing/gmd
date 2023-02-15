@@ -125,17 +125,17 @@ func (o *Consumer) init() *Consumer {
 // /////////////////////////////////////////////////////////////
 
 func (o *Consumer) onAfter(_ context.Context) (ignored bool) {
-	log.Debugf("%s: processor stopped", o.name)
+	log.Infof("%s: processor stopped", o.name)
 	return
 }
 
 func (o *Consumer) onBefore(_ context.Context) (ignored bool) {
-	log.Debugf("%s: start processor", o.name)
+	log.Infof("%s: start processor", o.name)
 	return
 }
 
 func (o *Consumer) onCallChannel(ctx context.Context) (ignored bool) {
-	log.Debugf("%s: listen channel signal", o.name)
+	log.Infof("%s: listen channel signal", o.name)
 
 	for {
 		select {
@@ -147,10 +147,11 @@ func (o *Consumer) onCallChannel(ctx context.Context) (ignored bool) {
 
 func (o *Consumer) onCallClientBuild(_ context.Context) (ignored bool) {
 	var (
-		err  error
-		node = fmt.Sprintf("%sT%dP%d", strings.ToUpper(strings.ReplaceAll(uuid.NewString(), "-", "")), o.id, o.parallel)
-		opts = []consumer.Option{
-			consumer.WithGroupName(Agent.GenGroupName(o.task.Id)),
+		err   error
+		group = Agent.GenGroupName(o.task.Id)
+		node  = fmt.Sprintf("%sT%dP%d", strings.ToUpper(strings.ReplaceAll(uuid.NewString(), "-", "")), o.id, o.parallel)
+		opts  = []consumer.Option{
+			consumer.WithGroupName(group),
 			consumer.WithNsResolver(primitive.NewPassthroughResolver(conf.Config.Account.Rocketmq.Servers)),
 			consumer.WithInstance(node),
 		}
@@ -189,14 +190,17 @@ func (o *Consumer) onCallClientBuild(_ context.Context) (ignored bool) {
 	}
 
 	// Client create succeed.
-	log.Infof("%s: client built, node=%s", o.name, node)
+	log.Infof("%s: client built, group=%s, node=%s", o.name, group, node)
 	return
 }
 
 func (o *Consumer) onCallClientDestroy(_ context.Context) (ignored bool) {
 	// Shutdown client.
 	if err := o.client.Shutdown(); err != nil {
-		log.Errorf("%s: client shutdown failed: error=%v", o.name, err)
+		log.Errorf("%s: client shutdown failed: error=%v",
+			o.name,
+			err,
+		)
 	}
 
 	// Reset and next
@@ -215,7 +219,8 @@ func (o *Consumer) onCallClientWaitIdle(ctx context.Context) (ignored bool) {
 		return o.onCallClientWaitIdle(ctx)
 	}
 
-	// Next event callee.
+	// Next
+	// event callee.
 	log.Infof("%s: client idle", o.name)
 	return
 }
@@ -223,13 +228,12 @@ func (o *Consumer) onCallClientWaitIdle(ctx context.Context) (ignored bool) {
 func (o *Consumer) onCallClientSubscribe(_ context.Context) (ignored bool) {
 	// Build received manager.
 	o.received = &Received{
-		client:     o.client,
-		dispatcher: o.dispatcher,
-		name:       o.name,
-		selector:   consumer.MessageSelector{Type: consumer.TAG, Expression: o.task.TopicTag},
-		task:       o.task,
-		topic:      Agent.GenTopicName(o.task.TopicName),
-
+		client:          o.client,
+		dispatcher:      o.dispatcher,
+		name:            o.name,
+		selector:        consumer.MessageSelector{Type: consumer.TAG, Expression: o.task.TopicTag},
+		task:            o.task,
+		topic:           Agent.GenTopicName(o.task.TopicName),
 		callbackResume:  o.doClientResume,
 		callbackSuspend: o.doClientSuspend,
 	}
@@ -244,15 +248,27 @@ func (o *Consumer) onCallClientSubscribe(_ context.Context) (ignored bool) {
 
 	// Subscribe topic.
 	if err := o.client.Subscribe(o.received.topic, o.received.selector, o.received.Consume); err != nil {
-		log.Errorf("%s: client subscribe failed, topic=%s, tag=%s, error=%v", o.name, o.received.topic, o.received.selector.Expression, err)
+		log.Errorf("%s: client subscribe failed, topic=%s, tag=%s, error=%v",
+			o.name,
+			o.received.topic,
+			o.received.selector.Expression,
+			err,
+		)
 		return true
 	} else {
-		log.Infof("%s: client subscribed, topic=%s, tag=%v", o.name, o.received.topic, o.received.selector.Expression)
+		log.Infof("%s: client subscribe, topic=%s, tag=%v",
+			o.name,
+			o.received.topic,
+			o.received.selector.Expression,
+		)
 	}
 
 	// Start client.
 	if err := o.client.Start(); err != nil {
-		log.Errorf("%s: client start failed, error=%v", o.name, err)
+		log.Errorf("%s: client start failed, error=%v",
+			o.name,
+			err,
+		)
 		return true
 	}
 
@@ -265,24 +281,38 @@ func (o *Consumer) onCallTaskCheck(_ context.Context) (ignored bool) {
 	// Return true
 	// if subscription task not found in memory.
 	if o.task = base.Memory.GetTask(o.id); o.task == nil {
-		log.Errorf("%s: subscription task not found", o.name)
+		log.Errorf("%s: task not found, task-id=%d",
+			o.name,
+			o.id,
+		)
 		return true
 	}
 
 	// Return true
 	// if adapter parallel is greater or equal to task parallels.
 	if o.parallel >= o.task.Parallels {
-		log.Errorf("%s: subscription task parallels limited", o.name)
+		log.Warnf("%s: task parallels limited, current=%d, maximum=%d",
+			o.name,
+			o.parallel+1,
+			o.task.Parallels,
+		)
 		return true
 	}
 
 	// Next
 	// event callee.
-	log.Infof("%s: subscription task loaded, topic=%v, tag=%v, filter=%v, delay-seconds=%d, title=%s", o.name, o.task.TopicName, o.task.TopicTag, o.task.FilterTag, o.task.DelaySeconds, o.task.Title)
+	log.Infof("%s: task found, task-id=%d, delay-seconds=%d, task-title=%s",
+		o.name,
+		o.task.Id,
+		o.task.DelaySeconds,
+		o.task.Title,
+	)
 	return false
 }
 
 func (o *Consumer) onCallTaskSync(_ context.Context) bool {
+	// TODO : admin interface not list topic and view topic.
+
 	// Next
 	// event callee.
 	return false

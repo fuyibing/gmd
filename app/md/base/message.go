@@ -25,6 +25,7 @@ type (
 		ignored  bool
 
 		Dequeue          int
+		Keyword          string
 		MessageBody      string
 		MessageId        string
 		MessageTime      int64
@@ -76,6 +77,7 @@ func (o *Message) after() {
 	// Reset
 	// data properties.
 	o.Dequeue = 0
+	o.Keyword = ""
 	o.MessageBody = ""
 	o.MessageId = ""
 	o.MessageTime = 0

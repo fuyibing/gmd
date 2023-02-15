@@ -17,11 +17,11 @@ go build -o gmd && \
 
 ----
 
-### Supported middleware
+### Supports
 
-1. AliyunMNS
-2. RabbitMQ
-3. RocketMQ
+1. [x] Aliyun MNS
+2. [x] Rocket MQ
+3. [ ] Rabbit MQ
 
 ----
 

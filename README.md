@@ -13,7 +13,7 @@ go build -o gmd && \
 ./gmd start
 ```
 
-![Work flow](./docs/work-flow.png)
+![Work flow](https://raw.githubusercontent.com/fuyibing/gmd/master/docs/work-flow.png)
 
 ----
 

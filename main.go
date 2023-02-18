@@ -19,7 +19,8 @@ import (
 	"github.com/fuyibing/gmd/app/md"
 	"github.com/fuyibing/gmd/app/md/conf"
 	"github.com/fuyibing/gmd/app/middlewares"
-	"github.com/fuyibing/log/v3"
+	"github.com/fuyibing/log/v8"
+	logConf "github.com/fuyibing/log/v8/conf"
 	"github.com/kataras/iris/v12"
 	"github.com/kataras/iris/v12/middleware/pprof"
 	"github.com/kataras/iris/v12/mvc"
@@ -203,6 +204,11 @@ func (o *Bootstrap) Run(_ managers.Manager, _ managers.Arguments) error {
 // /////////////////////////////////////////////////////////////
 
 func init() {
+	log.Config.Set(
+		logConf.SetServiceHost("192.168.10.110"),
+		logConf.SetServicePort(8101),
+	)
+
 	// Initialize console
 	// then add bootstrap command into manager.
 	if cm, ce = console.Default(); ce == nil {
@@ -214,6 +220,8 @@ func init() {
 }
 
 func main() {
+	defer log.Client.Close()
+
 	// Run console
 	// with terminal arguments.
 	if ce == nil {

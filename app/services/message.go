@@ -4,7 +4,7 @@
 package services
 
 import (
-	"github.com/fuyibing/db/v3"
+	"github.com/fuyibing/db/v8"
 	"github.com/fuyibing/gmd/app/models"
 	"xorm.io/xorm"
 )

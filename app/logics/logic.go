@@ -10,9 +10,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/fuyibing/gmd/app"
-	"github.com/fuyibing/log/v3"
-	"github.com/fuyibing/log/v3/trace"
-	"github.com/fuyibing/util/v2/web/response"
+	"github.com/fuyibing/log/v8"
+	"github.com/fuyibing/log/v8/conf"
+	"github.com/fuyibing/util/v8/web/response"
 	"github.com/kataras/iris/v12"
 	"net/http"
 	"regexp"
@@ -41,7 +41,7 @@ func New(i iris.Context, logics ...Logic) (res interface{}) {
 
 	// Create open tracing context
 	// based on middleware definitions.
-	if x := i.Values().Get(trace.OpenTracingKey); x != nil {
+	if x := i.Values().Get(conf.OpenTracingKey); x != nil {
 		if cx, ok = x.(context.Context); ok {
 			ctx = cx
 		}
@@ -50,7 +50,7 @@ func New(i iris.Context, logics ...Logic) (res interface{}) {
 	// Build default context
 	// if request headers not specified.
 	if ctx == nil {
-		ctx = trace.FromRequest(i.Request())
+		ctx = log.NewRequest(i.Request())
 	}
 
 	// Called

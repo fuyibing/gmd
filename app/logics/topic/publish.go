@@ -10,10 +10,9 @@ import (
 	"github.com/fuyibing/gmd/app"
 	"github.com/fuyibing/gmd/app/md"
 	"github.com/fuyibing/gmd/app/md/base"
-	"github.com/fuyibing/log/v3"
-	"github.com/fuyibing/log/v3/trace"
-	"github.com/fuyibing/util/v2/web/request"
-	"github.com/fuyibing/util/v2/web/response"
+	"github.com/fuyibing/log/v8"
+	"github.com/fuyibing/util/v8/web/request"
+	"github.com/fuyibing/util/v8/web/response"
 	"github.com/google/uuid"
 	"github.com/kataras/iris/v12"
 	"strings"
@@ -94,7 +93,7 @@ func (o *Publish) Send(ctx context.Context) error {
 	log.Infofc(ctx, "logic call producer manager: topic=%s, tag=%s, filter=%s, hash=%s", o.registry.TopicName, o.registry.TopicTag, o.registry.FilterTag, o.response.Hash)
 
 	var (
-		c = trace.Child(ctx)
+		c = log.NewChild(ctx)
 		p = base.Pool.AcquirePayload().SetContext(c)
 	)
 

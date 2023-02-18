@@ -5,14 +5,13 @@ package md
 
 import (
 	"context"
-	"github.com/fuyibing/db/v3"
+	"github.com/fuyibing/db/v8"
 	"github.com/fuyibing/gmd/app/md/base"
 	"github.com/fuyibing/gmd/app/md/conf"
 	"github.com/fuyibing/gmd/app/models"
 	"github.com/fuyibing/gmd/app/services"
-	"github.com/fuyibing/log/v3"
-	"github.com/fuyibing/log/v3/trace"
-	"github.com/fuyibing/util/v2/process"
+	"github.com/fuyibing/log/v8"
+	"github.com/fuyibing/util/v8/process"
 	"sync"
 	"time"
 )
@@ -303,13 +302,13 @@ func (o *retry) SendMessages() (count int) {
 	}
 
 	// Publish with parallel mode.
-	ctx = trace.New()
+	ctx = log.NewContext()
 	log.Infofc(ctx, "retry manager: waiting messages loaded, count=%d", count)
 
 	wg = &sync.WaitGroup{}
 	for i0, b0 := range list {
 		wg.Add(1)
-		c0 := trace.Child(ctx)
+		c0 := log.NewChild(ctx)
 		go func(c1 context.Context, b1 *models.Message, i1 int) {
 			defer wg.Done()
 			o.SendMessage(c1, b1, i1)
@@ -424,13 +423,13 @@ func (o *retry) SendPayloads() (count int) {
 	}
 
 	// Publish with parallel mode.
-	ctx = trace.New()
+	ctx = log.NewContext()
 	log.Infofc(ctx, "retry manager: load waiting payloads, count=%d", count)
 
 	wg = &sync.WaitGroup{}
 	for i0, b0 := range list {
 		wg.Add(1)
-		c0 := trace.Child(ctx)
+		c0 := log.NewChild(ctx)
 		go func(c1 context.Context, b1 *models.Payload, i1 int) {
 			defer wg.Done()
 			o.SendPayload(c1, b1, i1)

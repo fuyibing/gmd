@@ -6,12 +6,11 @@ package base
 import (
 	"context"
 	"fmt"
-	"github.com/fuyibing/db/v3"
+	"github.com/fuyibing/db/v8"
 	"github.com/fuyibing/gmd/app/md/conf"
 	"github.com/fuyibing/gmd/app/models"
 	"github.com/fuyibing/gmd/app/services"
-	"github.com/fuyibing/log/v3"
-	"github.com/fuyibing/log/v3/trace"
+	"github.com/fuyibing/log/v8"
 )
 
 type (
@@ -100,7 +99,7 @@ func (o *Message) save() {
 		affects int64
 		bean    *models.Message
 		beanId  int64
-		ctx     = trace.Child(o.c)
+		ctx     = log.NewChild(o.c)
 		err     error
 		sess    = db.Connector.GetMasterWithContext(ctx, models.ConnectionName)
 		service = services.NewMessageService(sess)

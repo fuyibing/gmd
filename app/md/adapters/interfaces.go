@@ -8,7 +8,7 @@ package adapters
 import (
 	"context"
 	"github.com/fuyibing/gmd/app/md/base"
-	"github.com/fuyibing/util/v2/process"
+	"github.com/fuyibing/util/v8/process"
 )
 
 type (

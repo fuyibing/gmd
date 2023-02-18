@@ -9,7 +9,7 @@ import (
 	"github.com/fuyibing/gmd/app/md/adapters"
 	"github.com/fuyibing/gmd/app/md/base"
 	"github.com/fuyibing/gmd/app/md/conf"
-	"github.com/fuyibing/log/v3"
+	"github.com/fuyibing/log/v8"
 	"sync"
 )
 

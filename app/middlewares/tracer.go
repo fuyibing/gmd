@@ -4,7 +4,8 @@
 package middlewares
 
 import (
-	"github.com/fuyibing/log/v3/trace"
+	"github.com/fuyibing/log/v8"
+	"github.com/fuyibing/log/v8/conf"
 	"github.com/kataras/iris/v12"
 )
 
@@ -12,6 +13,6 @@ import (
 //
 // initialize open tracing.
 func Tracer(i iris.Context) {
-	i.Values().Set(trace.OpenTracingKey, trace.FromRequest(i.Request()))
+	i.Values().Set(conf.OpenTracingKey, log.NewRequest(i.Request()))
 	i.Next()
 }

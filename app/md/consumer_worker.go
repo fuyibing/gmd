@@ -10,8 +10,7 @@ import (
 	"github.com/fuyibing/gmd/app/md/base"
 	"github.com/fuyibing/gmd/app/md/conf"
 	"github.com/fuyibing/gmd/app/md/dispatchers"
-	"github.com/fuyibing/log/v3"
-	"github.com/fuyibing/log/v3/trace"
+	"github.com/fuyibing/log/v8"
 	"github.com/google/uuid"
 	"strings"
 	"sync/atomic"
@@ -91,7 +90,7 @@ func (o *worker) DoConsume(t *base.Task, m *base.Message) (ignored, retry bool) 
 	log.Infofc(m.GetContext(), "consumer worker: consume message, task-id=%d, try-count=%d, message-id=%s", t.Id, m.Dequeue, m.MessageId)
 
 	var (
-		c   = trace.Child(m.GetContext())
+		c   = log.NewChild(m.GetContext())
 		err error
 		raw string
 		s   *base.Subscriber
@@ -146,7 +145,7 @@ func (o *worker) DoNotify(m *base.Message, topic, tag string) {
 	// Acquire payload
 	// then assign fields.
 	log.Infofc(m.GetContext(), "notify begin: topic=%s, tag=%s", topic, tag)
-	c = trace.Child(m.GetContext())
+	c = log.NewChild(m.GetContext())
 	p = base.Pool.AcquirePayload().SetContext(c)
 	p.Offset = 0
 	p.Hash = strings.ToUpper(strings.ReplaceAll(uuid.NewString(), "-", ""))

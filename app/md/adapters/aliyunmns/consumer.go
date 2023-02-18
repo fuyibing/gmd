@@ -9,9 +9,8 @@ import (
 	"fmt"
 	"github.com/fuyibing/gmd/app/md/base"
 	"github.com/fuyibing/gmd/app/md/conf"
-	"github.com/fuyibing/log/v3"
-	"github.com/fuyibing/log/v3/trace"
-	"github.com/fuyibing/util/v2/process"
+	"github.com/fuyibing/log/v8"
+	"github.com/fuyibing/util/v8/process"
 	"sync/atomic"
 	"time"
 
@@ -63,7 +62,7 @@ func (o *Consumer) doReceivedMessage(res mns.MessageReceiveResponse) {
 	// Prepare
 	// for message consume process.
 	var (
-		ctx = trace.New()
+		ctx = log.NewContext()
 		msg *base.Message
 	)
 

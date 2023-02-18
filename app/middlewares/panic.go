@@ -5,8 +5,8 @@ package middlewares
 
 import (
 	"context"
-	"github.com/fuyibing/log/v3"
-	"github.com/fuyibing/log/v3/trace"
+	"github.com/fuyibing/log/v8"
+	"github.com/fuyibing/log/v8/conf"
 	"github.com/kataras/iris/v12"
 	"net/http"
 )
@@ -27,7 +27,7 @@ func Panic(i iris.Context) {
 
 		defer i.StopExecution()
 
-		if t := i.Values().Get(trace.OpenTracingKey); t != nil {
+		if t := i.Values().Get(conf.OpenTracingKey); t != nil {
 			c = t.(context.Context)
 		}
 

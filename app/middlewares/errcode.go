@@ -5,7 +5,7 @@ package middlewares
 
 import (
 	"fmt"
-	"github.com/fuyibing/util/v2/web/response"
+	"github.com/fuyibing/util/v8/web/response"
 	"github.com/kataras/iris/v12"
 	"net/http"
 )

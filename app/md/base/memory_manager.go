@@ -6,7 +6,7 @@ package base
 import (
 	"context"
 	"fmt"
-	"github.com/fuyibing/db/v3"
+	"github.com/fuyibing/db/v8"
 	"github.com/fuyibing/gmd/app/models"
 	"github.com/fuyibing/gmd/app/services"
 	"strings"
@@ -102,6 +102,7 @@ func (o *memory) GetTaskFromBean(ctx context.Context, id int) (task *Task, err e
 		bean *models.Task
 		sess = db.Connector.GetSlaveWithContext(ctx)
 	)
+
 	if bean, err = services.NewTaskService(sess).GetById(id); err != nil || bean == nil {
 		return
 	}

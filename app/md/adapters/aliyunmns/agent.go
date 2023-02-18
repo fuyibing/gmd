@@ -9,7 +9,7 @@ import (
 	mns "github.com/aliyun/aliyun-mns-go-sdk"
 	"github.com/fuyibing/gmd/app/md/base"
 	"github.com/fuyibing/gmd/app/md/conf"
-	"github.com/fuyibing/log/v3"
+	"github.com/fuyibing/log/v8"
 	"regexp"
 	"strings"
 	"sync"

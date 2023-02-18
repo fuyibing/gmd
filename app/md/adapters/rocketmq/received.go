@@ -10,8 +10,7 @@ import (
 	"github.com/apache/rocketmq-client-go/v2/consumer"
 	"github.com/apache/rocketmq-client-go/v2/primitive"
 	"github.com/fuyibing/gmd/app/md/base"
-	"github.com/fuyibing/log/v3"
-	"github.com/fuyibing/log/v3/trace"
+	"github.com/fuyibing/log/v8"
 	"strconv"
 	"sync/atomic"
 	"time"
@@ -120,7 +119,7 @@ func (o *Received) doConsume(m *primitive.MessageExt) (consumer.ConsumeResult, e
 	// Prepare
 	// for message consume process.
 	var (
-		ctx            = trace.New()
+		ctx            = log.NewContext()
 		msg            *base.Message
 		topicMessageId = m.MsgId
 		bornTime       = m.BornTimestamp

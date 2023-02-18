@@ -9,7 +9,7 @@ import (
 	"encoding/json"
 	"github.com/fuyibing/gmd/app/logics"
 	"github.com/fuyibing/gmd/app/logics/index"
-	"github.com/fuyibing/util/v2/web/response"
+	"github.com/fuyibing/util/v8/web/response"
 	"github.com/kataras/iris/v12"
 )
 

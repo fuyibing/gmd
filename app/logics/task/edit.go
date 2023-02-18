@@ -6,15 +6,14 @@ package task
 import (
 	"context"
 	"fmt"
-	"github.com/fuyibing/db/v3"
+	"github.com/fuyibing/db/v8"
 	"github.com/fuyibing/gmd/app"
 	"github.com/fuyibing/gmd/app/md"
 	"github.com/fuyibing/gmd/app/models"
 	"github.com/fuyibing/gmd/app/services"
-	"github.com/fuyibing/log/v3"
-	"github.com/fuyibing/log/v3/trace"
-	"github.com/fuyibing/util/v2/web/request"
-	"github.com/fuyibing/util/v2/web/response"
+	"github.com/fuyibing/log/v8"
+	"github.com/fuyibing/util/v8/web/request"
+	"github.com/fuyibing/util/v8/web/response"
 	"github.com/kataras/iris/v12"
 )
 
@@ -87,7 +86,7 @@ func (o *Edit) Run(ctx context.Context, i iris.Context) (res interface{}) {
 
 	// Call send to do main process.
 	log.Infofc(ctx, "logic send request: task-id=%d", o.request.Id)
-	c := trace.Child(ctx)
+	c := log.NewChild(ctx)
 	if code, err = o.Send(c); err != nil {
 		return response.With.ErrorCode(err, code)
 	}

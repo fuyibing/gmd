@@ -1,0 +1,14 @@
+# ignore directories.
+
+.git/
+.idea/
+
+logs/
+tests/
+
+# category files.
+*.bak
+
+# ignore files.
+go.sum
+

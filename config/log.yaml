@@ -1,0 +1,8 @@
+#
+# Log plugin configuraion
+#
+adapter: term
+level: DEBUG
+async-disabled: true
+term:
+  color: true

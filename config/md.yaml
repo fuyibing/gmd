@@ -1,4 +1,0 @@
-#
-# Message Dispatcher configurations.
-#
-adapter: "aliyunmns"

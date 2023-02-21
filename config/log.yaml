@@ -4,5 +4,6 @@
 adapter: term
 level: DEBUG
 async-disabled: true
+prefix: "# "
 term:
   color: true

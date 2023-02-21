@@ -5,7 +5,7 @@ package main
 
 import (
 	"context"
-	"github.com/fuyibing/gmd/v8/app/md"
+	"github.com/fuyibing/gmd/v8/core/managers"
 	"github.com/fuyibing/log/v8"
 	"time"
 )
@@ -14,42 +14,21 @@ func init() {
 }
 
 func main() {
-	var (
-		cancel context.CancelFunc
-		ctx    context.Context
-		err    error
-	)
+	defer log.Client.Close()
 
-	defer func() {
-		if err != nil {
-			log.Errorf("main error: %v", err)
-		}
-
-		if ctx != nil && ctx.Err() == nil {
-			cancel()
-		}
-
-		log.Client.Close()
-	}()
-
-	if err = md.Boot.Prepare(); err != nil {
-		log.Errorf("boot: %v", err)
-		return
-	}
+	ctx, canceler := context.WithCancel(context.Background())
+	t := time.Now().Format("15:04:05")
 
 	go func() {
-		time.Sleep(time.Second * 2)
-		if err == nil {
+		time.Sleep(time.Second * 3)
+		log.Warnf("---------------- [restart=%s] ----------------", t)
+		managers.Boot.Restart()
 
-			log.Warnf("------ call restart")
-			md.Boot.Restart()
-
-			time.Sleep(time.Second * 5)
-			log.Warnf("------ call canceller")
-			cancel()
-		}
+		time.Sleep(time.Second * 5)
+		log.Warnf("---------------- [cancelled=%s] ----------------", t)
+		canceler()
 	}()
 
-	ctx, cancel = context.WithCancel(context.Background())
-	err = md.Boot.Start(ctx)
+	log.Warnf("---------------- [ready=%s] ----------------", t)
+	_ = managers.Boot.Start(ctx)
 }

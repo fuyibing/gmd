@@ -1,0 +1,2 @@
+adapter: "aliyunmns"
+memory-reload-seconds: 30

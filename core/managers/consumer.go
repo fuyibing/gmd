@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"github.com/fuyibing/gmd/v8/app"
 	"github.com/fuyibing/gmd/v8/core/base"
-	"github.com/fuyibing/log/v8"
 	"github.com/fuyibing/util/v8/process"
 	"sync"
 	"time"
@@ -34,15 +33,15 @@ func (o *Consumer) DoConsume(_ *base.Task, _ *base.Message) (retry bool, err err
 
 func (o *Consumer) DoMemoryReload() {
 	var (
-		c   = log.NewContextInfo("{%s} begin load memory", o.name)
+		c   = context.Background() // log.NewContextInfo("{%s} begin load memory", o.name)
 		err error
 	)
 
 	defer func() {
 		if err != nil {
-			log.Errorfc(c, "{%s} memory load error: %v", o.name, err)
+			// log.Errorfc(c, "{%s} memory load error: %v", o.name, err)
 		} else {
-			log.Infofc(c, "{%s} memory load finish", o.name)
+			// log.Infofc(c, "{%s} memory load finish", o.name)
 		}
 	}()
 
@@ -104,7 +103,7 @@ func (o *Consumer) OnBeforeCallable(_ context.Context) (ignored bool) {
 	// Return true
 	// if constructor not injected into container.
 	if o.callable = Container.GetConsumer(); o.callable == nil {
-		log.Errorf("consumer constructor for {%s} adapter not injected", app.Config.GetAdapter())
+		// log.Errorf("consumer constructor for {%s} adapter not injected", app.Config.GetAdapter())
 		return true
 	}
 
@@ -115,7 +114,7 @@ func (o *Consumer) OnCallChannel(ctx context.Context) (ignored bool) {
 	// Register ticker
 	// for memory update frequency.
 	tick := time.NewTicker(time.Duration(app.Config.GetMemoryReloadSeconds()) * time.Second)
-	log.Infof("{%s} register ticker: type=memory, seconds=%d", o.name, app.Config.GetMemoryReloadSeconds())
+	// log.Infof("{%s} register ticker: type=memory, seconds=%d", o.name, app.Config.GetMemoryReloadSeconds())
 
 	// Listen
 	// channel signal.
@@ -136,7 +135,7 @@ func (o *Consumer) OnCallSubprocessLoad(_ context.Context) (ignored bool) {
 }
 
 func (o *Consumer) OnPanic(ctx context.Context, v interface{}) {
-	log.Panicfc(ctx, "processor {%s} fatal: %v", o.name, v)
+	// log.Panicfc(ctx, "processor {%s} fatal: %v", o.name, v)
 }
 
 // /////////////////////////////////////////////////////////////

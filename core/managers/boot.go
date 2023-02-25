@@ -6,7 +6,7 @@ package managers
 import (
 	"context"
 	"github.com/fuyibing/gmd/v8/core/base"
-	"github.com/fuyibing/log/v8"
+	"github.com/fuyibing/log/v5"
 	"github.com/fuyibing/util/v8/process"
 	"sync"
 )
@@ -60,11 +60,17 @@ func (o *boot) OnBefore(_ context.Context) (ignored bool) {
 }
 
 func (o *boot) OnBeforeMemory(ctx context.Context) (ignored bool) {
-	if err := base.Memory.Reload(ctx); err != nil {
-		log.Errorf("{%s} initialize memory: %v", o.name, err)
+	trace := log.Manager.NewTraceFromContext(ctx, "memory")
+
+	span := trace.NewSpan("update")
+	defer span.End()
+
+	if err := base.Memory.Reload(span.GetContext()); err != nil {
+		span.Error("update error: %v", err)
 		return true
 	}
 
+	span.Info("update succeed")
 	return
 }
 
@@ -78,7 +84,7 @@ func (o *boot) OnCall(ctx context.Context) (ignored bool) {
 }
 
 func (o *boot) OnPanic(ctx context.Context, v interface{}) {
-	log.Panicfc(ctx, "processor {%s} fatal: %v", o.name, v)
+	// log.Panicfc(ctx, "processor {%s} fatal: %v", o.name, v)
 }
 
 // /////////////////////////////////////////////////////////////
@@ -103,9 +109,9 @@ func (o *boot) init() *boot {
 
 	o.processor.Add(
 		o.consumer.processor,
-		o.producer.processor,
-		o.remoting.processor,
-		o.retry.processor,
+		// o.producer.processor,
+		// o.remoting.processor,
+		// o.retry.processor,
 	)
 
 	return o

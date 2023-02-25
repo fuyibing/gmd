@@ -1,2 +1,6 @@
-adapter: "aliyunmns"
+adapter: "rocketmq"
+adapter-rocketmq:
+  servers:
+    - "127.0.0.1:9876"
+
 memory-reload-seconds: 30

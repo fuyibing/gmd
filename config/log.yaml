@@ -1,9 +1,9 @@
 #
-# Log plugin configuraion
+# log-trace
 #
-adapter: term
-level: DEBUG
-async-disabled: true
-prefix: "# "
-term:
-  color: true
+
+service-name: "gmd-v8"
+service-port: 8101
+service-version: "8.0"
+
+tracer-topic: "gmd-v8"

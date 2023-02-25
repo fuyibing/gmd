@@ -6,7 +6,6 @@ package aliyunmns
 import (
 	"context"
 	"github.com/fuyibing/gmd/v8/core/base"
-	"github.com/fuyibing/log/v8"
 	"github.com/fuyibing/util/v8/process"
 )
 
@@ -39,17 +38,17 @@ func (o *Consumer) Processor() process.Processor { return o.processor }
 // /////////////////////////////////////////////////////////////
 
 func (o *Consumer) OnAfter(_ context.Context) (ignored bool) {
-	log.Infof("{%s} stopped", o.name)
+	// log.Infof("{%s} stopped", o.name)
 	return
 }
 
 func (o *Consumer) OnBefore(_ context.Context) (ignored bool) {
-	log.Infof("{%s} start", o.name)
+	// log.Infof("{%s} start", o.name)
 	return
 }
 
 func (o *Consumer) OnCall(_ context.Context) (ignored bool) {
-	log.Infof("{%s} listen channel signal", o.name)
+	// log.Infof("{%s} listen channel signal", o.name)
 	return
 }
 
@@ -63,7 +62,7 @@ func (o *Consumer) OnCallChannel(ctx context.Context) (ignored bool) {
 }
 
 func (o *Consumer) OnPanic(ctx context.Context, v interface{}) {
-	log.Panicfc(ctx, "processor {%s} fatal: %v", o.name, v)
+	// log.Panicfc(ctx, "processor {%s} fatal: %v", o.name, v)
 }
 
 // /////////////////////////////////////////////////////////////

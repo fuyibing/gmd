@@ -5,7 +5,6 @@ package managers
 
 import (
 	"context"
-	"github.com/fuyibing/log/v8"
 	"github.com/fuyibing/util/v8/process"
 )
 
@@ -40,7 +39,7 @@ func (o *Retry) OnCall(ctx context.Context) (ignored bool) {
 }
 
 func (o *Retry) OnPanic(ctx context.Context, v interface{}) {
-	log.Panicfc(ctx, "processor {%s} fatal: %v", o.name, v)
+	// log.Panicfc(ctx, "processor {%s} fatal: %v", o.name, v)
 }
 
 // /////////////////////////////////////////////////////////////

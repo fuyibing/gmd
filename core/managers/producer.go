@@ -5,9 +5,7 @@ package managers
 
 import (
 	"context"
-	"github.com/fuyibing/gmd/v8/app"
 	"github.com/fuyibing/gmd/v8/core/base"
-	"github.com/fuyibing/log/v8"
 	"github.com/fuyibing/util/v8/process"
 )
 
@@ -38,7 +36,7 @@ func (o *Producer) OnBeforeSubprocess(_ context.Context) (ignored bool) {
 	// Return true
 	// if constructor not injected into container.
 	if o.callable = Container.GetProducer(); o.callable == nil {
-		log.Errorf("producer constructor for {%s} adapter not injected", app.Config.GetAdapter())
+		// log.Errorf("producer constructor for {%s} adapter not injected", app.Config.GetAdapter())
 		return true
 	}
 
@@ -66,7 +64,7 @@ func (o *Producer) OnCallListen(ctx context.Context) (ignored bool) {
 }
 
 func (o *Producer) OnPanic(ctx context.Context, v interface{}) {
-	log.Panicfc(ctx, "processor {%s} fatal: %v", o.name, v)
+	// log.Panicfc(ctx, "processor {%s} fatal: %v", o.name, v)
 }
 
 // /////////////////////////////////////////////////////////////

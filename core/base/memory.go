@@ -6,7 +6,7 @@ package base
 import (
 	"context"
 	"fmt"
-	"github.com/fuyibing/db/v8"
+	"github.com/fuyibing/db/v5"
 	"github.com/fuyibing/gmd/v8/app/models"
 	"github.com/fuyibing/gmd/v8/app/services"
 	"strings"

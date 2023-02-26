@@ -2,8 +2,18 @@
 # log-trace
 #
 
+logger-exporter: "term"
+logger-level: debug
+
 service-name: "gmd-v8"
 service-port: 8101
 service-version: "8.0"
 
+tracer-exporter: "jaeger"
 tracer-topic: "gmd-v8"
+
+jaeger-tracer:
+  content-type: "application/x-thrift"
+  endpoint: "http://localhost:14268/api/traces"
+
+

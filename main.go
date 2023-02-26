@@ -7,15 +7,16 @@ import (
 	"context"
 	"github.com/fuyibing/gmd/v8/core/managers"
 	"github.com/fuyibing/log/v5"
-	"github.com/fuyibing/log/v5/exporters/logger_term"
-	"github.com/fuyibing/log/v5/exporters/tracer_jaeger"
 	"time"
 )
 
 func init() {
-	log.Manager.LoggerManager().SetExporter(logger_term.NewExporter())
-	log.Manager.TracerManager().SetExporter(tracer_jaeger.NewExporter())
-	go log.Manager.Start(context.Background())
+	// log.Manager.LoggerManager().SetExporter(logger_term.NewExporter())
+	// log.Manager.TracerManager().SetExporter(tracer_jaeger.NewExporter())
+	go func() {
+		log.Manager.Start(context.Background())
+	}()
+
 }
 
 func main() {
@@ -40,13 +41,13 @@ func main() {
 	}()
 
 	go func() {
-		time.Sleep(time.Second * 2)
+		time.Sleep(time.Second * 35)
 		if err == nil {
 
-			log.Warn("------ call restart")
-			managers.Boot.Restart()
+			// log.Warn("------ call restart")
+			// managers.Boot.Restart()
 
-			time.Sleep(time.Second * 5)
+			// time.Sleep(time.Second * 5)
 			log.Warn("------ call canceller")
 			cancel()
 		}

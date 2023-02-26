@@ -60,17 +60,19 @@ func (o *boot) OnBefore(_ context.Context) (ignored bool) {
 }
 
 func (o *boot) OnBeforeMemory(ctx context.Context) (ignored bool) {
-	trace := log.Manager.NewTraceFromContext(ctx, "memory")
+	var (
+		trace = log.Manager.NewTraceFromContext(ctx, "memory")
+		span  = trace.NewSpan("boot.memory.update")
+	)
 
-	span := trace.NewSpan("update")
 	defer span.End()
 
 	if err := base.Memory.Reload(span.GetContext()); err != nil {
-		span.Error("update error: %v", err)
+		span.Logger().Error("%v", err)
 		return true
 	}
 
-	span.Info("update succeed")
+	span.Logger().Info("succeed")
 	return
 }
 
@@ -84,7 +86,11 @@ func (o *boot) OnCall(ctx context.Context) (ignored bool) {
 }
 
 func (o *boot) OnPanic(ctx context.Context, v interface{}) {
-	// log.Panicfc(ctx, "processor {%s} fatal: %v", o.name, v)
+	if sp, spe := log.Span(ctx); spe {
+		sp.Logger().Fatal("processor {%s} fatal: %v", o.name, v)
+	} else {
+		log.Fatal("processor {%s} fatal: %v", o.name, v)
+	}
 }
 
 // /////////////////////////////////////////////////////////////

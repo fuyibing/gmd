@@ -70,7 +70,7 @@ func (o *Task) initFields(m *models.Task) {
 	}
 
 	if o.MaxRetry = m.MaxRetry; o.MaxRetry == 0 {
-		o.Concurrency = models.DefaultMaxRetry
+		o.MaxRetry = models.DefaultMaxRetry
 	}
 
 	if u := m.GmtUpdated.Time().Unix(); u > 0 {

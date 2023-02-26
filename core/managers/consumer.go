@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"github.com/fuyibing/gmd/v8/app"
 	"github.com/fuyibing/gmd/v8/core/base"
+	"github.com/fuyibing/log/v5"
 	"github.com/fuyibing/util/v8/process"
 	"sync"
 	"time"
@@ -33,19 +34,22 @@ func (o *Consumer) DoConsume(_ *base.Task, _ *base.Message) (retry bool, err err
 
 func (o *Consumer) DoMemoryReload() {
 	var (
-		c   = context.Background() // log.NewContextInfo("{%s} begin load memory", o.name)
+		c   = log.Manager.NewTrace("consumer")
+		cs  = c.NewSpan("consumer.memory.reload")
 		err error
 	)
 
 	defer func() {
 		if err != nil {
-			// log.Errorfc(c, "{%s} memory load error: %v", o.name, err)
+			cs.Logger().Error("%v", err)
 		} else {
-			// log.Infofc(c, "{%s} memory load finish", o.name)
+			cs.Logger().Info("completed")
 		}
+
+		cs.End()
 	}()
 
-	if err = base.Memory.Reload(c); err != nil {
+	if err = base.Memory.Reload(cs.GetContext()); err != nil {
 		return
 	}
 

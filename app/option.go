@@ -5,6 +5,6 @@ package app
 
 type (
 	// Option
-	// for configure easily, like setter.
+	// 配置选项接口.
 	Option func(c *configuration)
 )

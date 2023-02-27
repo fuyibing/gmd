@@ -8,6 +8,8 @@ import (
 )
 
 var (
+	// Config
+	// 应用级配置.
 	Config Configuration
 )
 

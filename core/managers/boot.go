@@ -61,7 +61,7 @@ func (o *boot) OnBefore(_ context.Context) (ignored bool) {
 
 func (o *boot) OnBeforeMemory(ctx context.Context) (ignored bool) {
 	var (
-		trace = log.Manager.NewTraceFromContext(ctx, "memory")
+		trace = log.NewTraceFromContext(ctx, "memory")
 		span  = trace.NewSpan("boot.memory.update")
 	)
 

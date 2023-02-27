@@ -5,30 +5,30 @@ package base
 
 type (
 	// ContainerManager
-	// registered manager operations.
+	// 容器管理器.
 	ContainerManager interface {
 		// GetConsumer
-		// return consumer manager constructor.
+		// 获取MQ中间件的消费者构造函数.
 		GetConsumer() (callable ConsumerCallable)
 
 		// SetConsumer
-		// configure consumer manager constructor, singleton instance.
+		// 设置MQ中间件的消费者构造函数.
 		SetConsumer(callable ConsumerCallable)
 
 		// GetProducer
-		// return producer manager constructor.
+		// 获取MQ中间件的生产者构造函数.
 		GetProducer() (callable ProducerCallable)
 
 		// SetProducer
-		// configure producer manager constructor, singleton instance.
+		// 设置MQ中间件的生产者构造函数.
 		SetProducer(callable ProducerCallable)
 
 		// GetRemoting
-		// return remoting manager constructor.
+		// 获取MQ中间件的服务端构造函数.
 		GetRemoting() (callable RemotingCallable)
 
 		// SetRemoting
-		// configure remoting manager constructor, singleton instance.
+		// 设置MQ中间件的服务端构造函数.
 		SetRemoting(callable RemotingCallable)
 	}
 )

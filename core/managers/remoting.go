@@ -9,20 +9,16 @@ import (
 	"github.com/fuyibing/util/v8/process"
 )
 
-type Remoting struct {
-	adapter   base.RemotingManager
-	callable  base.RemotingCallable
-	name      string
-	processor process.Processor
-}
-
-// /////////////////////////////////////////////////////////////
-// Exported methods
-// /////////////////////////////////////////////////////////////
-
-// /////////////////////////////////////////////////////////////
-// Processor events
-// /////////////////////////////////////////////////////////////
+type (
+	// Remoting
+	// 服务端管理器.
+	Remoting struct {
+		adapter   base.RemotingManager
+		callable  base.RemotingCallable
+		name      string
+		processor process.Processor
+	}
+)
 
 func (o *Remoting) OnAfter(_ context.Context) (ignored bool) {
 	return
@@ -66,10 +62,6 @@ func (o *Remoting) OnCallListen(ctx context.Context) (ignored bool) {
 func (o *Remoting) OnPanic(ctx context.Context, v interface{}) {
 	// log.Panicfc(ctx, "processor {%s} fatal: %v", o.name, v)
 }
-
-// /////////////////////////////////////////////////////////////
-// Access methods
-// /////////////////////////////////////////////////////////////
 
 func (o *Remoting) init() *Remoting {
 	o.name = "remoting-manager"

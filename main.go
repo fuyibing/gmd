@@ -11,11 +11,15 @@ import (
 	"github.com/fuyibing/gmd/v8/app"
 	"github.com/fuyibing/gmd/v8/app/controllers"
 	"github.com/fuyibing/gmd/v8/app/middlewares"
+	"github.com/fuyibing/gmd/v8/core/managers"
 	"github.com/fuyibing/log/v5"
+	"github.com/fuyibing/log/v5/conf"
+	"github.com/fuyibing/log/v5/cores"
 	"github.com/kataras/iris/v12"
 	"github.com/kataras/iris/v12/middleware/pprof"
 	"github.com/kataras/iris/v12/mvc"
 	"os"
+	"time"
 )
 
 var (
@@ -111,11 +115,25 @@ func (o *gmd) run(_ cm.Manager, _ cm.Arguments) error {
 }
 
 // 加载内核.
-func (o *gmd) runBeforeLoadCore(_ *iris.Application) {}
+func (o *gmd) runBeforeLoadCore(_ *iris.Application) {
+	o.ctx, o.cancel = context.WithCancel(ctx)
+	go func(c context.Context) { _ = managers.Boot.Start(c) }(o.ctx)
+}
 
 // 加载日志.
 func (o *gmd) runBeforeLoadLogger(_ *iris.Application) {
 	go func() {
+		// 覆盖配置.
+		conf.Config.With(
+			conf.ServiceName(app.Config.GetName()),
+			conf.ServicePort(app.Config.GetPort()),
+			conf.ServiceVersion(app.Config.GetVersion()),
+		)
+
+		// 更新资源.
+		cores.Registry.Update()
+
+		// 启动日志.
 		if el := log.Manager.Start(ctx); el != nil {
 			_, _ = fmt.Fprintf(os.Stderr, fmt.Sprintf("%v", el))
 		}
@@ -123,6 +141,18 @@ func (o *gmd) runBeforeLoadLogger(_ *iris.Application) {
 }
 
 func (o *gmd) runInterrupt() {
+	// 退出信号.
+	if o.ctx != nil && o.ctx.Err() == nil {
+		o.cancel()
+	}
+
+	// 等待完成.
+	for {
+		if managers.Boot.Stopped() {
+			return
+		}
+		time.Sleep(time.Millisecond * 30)
+	}
 }
 
 func (o *gmd) runServe() {

@@ -9,20 +9,16 @@ import (
 	"github.com/fuyibing/util/v8/process"
 )
 
-type Producer struct {
-	adapter   base.ProducerManager
-	callable  base.ProducerCallable
-	name      string
-	processor process.Processor
-}
-
-// /////////////////////////////////////////////////////////////
-// Exported methods
-// /////////////////////////////////////////////////////////////
-
-// /////////////////////////////////////////////////////////////
-// Processor events
-// /////////////////////////////////////////////////////////////
+type (
+	// Producer
+	// 生产者管理器.
+	Producer struct {
+		adapter   base.ProducerManager
+		callable  base.ProducerCallable
+		name      string
+		processor process.Processor
+	}
+)
 
 func (o *Producer) OnAfter(_ context.Context) (ignored bool) {
 	return
@@ -66,10 +62,6 @@ func (o *Producer) OnCallListen(ctx context.Context) (ignored bool) {
 func (o *Producer) OnPanic(ctx context.Context, v interface{}) {
 	// log.Panicfc(ctx, "processor {%s} fatal: %v", o.name, v)
 }
-
-// /////////////////////////////////////////////////////////////
-// Access methods
-// /////////////////////////////////////////////////////////////
 
 func (o *Producer) init() *Producer {
 	o.name = "producer-manager"

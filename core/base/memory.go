@@ -15,41 +15,40 @@ import (
 
 var (
 	// Memory
-	// instance of memory manager.
+	// 内存管理.
 	Memory MemoryManager
 )
 
 type (
 	// MemoryManager
-	// interface of memory manager.
+	// 内存管理器.
 	MemoryManager interface {
 		// GetRegistries
-		// return registry map in memory.
+		// 获取注册组合列表.
 		GetRegistries() map[int]*Registry
 
 		// GetRegistry
-		// return registry instance in memory by id.
+		// 获取注册组合.
 		GetRegistry(id int) *Registry
 
 		// GetRegistryByName
-		// return registry instance in memory by topic name
-		// and tag.
+		// 获取订阅任务.
 		GetRegistryByName(topic, tag string) *Registry
 
 		// GetTask
-		// return task instance in memory by id.
+		// 获取订阅任务.
 		GetTask(id int) *Task
 
 		// GetTaskFromBean
-		// return task instance use task id.
+		// 获取订阅任务.
 		GetTaskFromBean(ctx context.Context, id int) (task *Task, err error)
 
 		// GetTasks
-		// return task instance map in memory.
+		// 获取订阅任务列表.
 		GetTasks() map[int]*Task
 
 		// Reload
-		// read from database into memory.
+		// 重新加载内存.
 		Reload(c context.Context) error
 	}
 
@@ -146,14 +145,10 @@ func (o *memory) key(topic, tag string) string {
 func (o *memory) loadRegistry(c context.Context) (err error) {
 	var list []*models.Registry
 
-	// List all registry
-	// from database.
 	if list, err = services.NewRegistryService(db.Connector.GetSlaveWithContext(c)).ListAll(); err != nil {
 		return
 	}
 
-	// Iterate registries
-	// and generate to buffer.
 	keys := make(map[string]int)
 	mapper := make(map[int]*Registry)
 	for _, bean := range list {
@@ -162,8 +157,6 @@ func (o *memory) loadRegistry(c context.Context) (err error) {
 		mapper[bean.Id] = (&Registry{}).init(bean)
 	}
 
-	// Set buffer
-	// as memory.
 	o.mu.Lock()
 	o.registryKey = keys
 	o.registryMapper = mapper
@@ -174,14 +167,10 @@ func (o *memory) loadRegistry(c context.Context) (err error) {
 func (o *memory) loadTask(c context.Context) (err error) {
 	var list []*models.Task
 
-	// List enable tasks
-	// from database.
 	if list, err = services.NewTaskService(db.Connector.GetSlaveWithContext(c)).ListEnables(); err != nil {
 		return
 	}
 
-	// Iterate tasks
-	// and generate to buffer.
 	tasks := make(map[int]*Task)
 	for _, bean := range list {
 		if r := o.GetRegistry(bean.RegistryId); r != nil {
@@ -189,8 +178,6 @@ func (o *memory) loadTask(c context.Context) (err error) {
 		}
 	}
 
-	// Set buffer
-	// as memory.
 	o.mu.Lock()
 	o.taskMapper = tasks
 	o.mu.Unlock()

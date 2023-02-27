@@ -9,19 +9,18 @@ import (
 	"sync"
 )
 
-type container struct {
-	ac base.ConsumerCallable
-	ap base.ProducerCallable
-	ar base.RemotingCallable
-	cs map[string]base.ConditionCallable
-	ds map[string]base.DispatcherCallable
-	rs map[string]base.ResultCallable
-	mu *sync.RWMutex
-}
-
-// /////////////////////////////////////////////////////////////
-// Interface
-// /////////////////////////////////////////////////////////////
+type (
+	// 适配器容器.
+	container struct {
+		ac base.ConsumerCallable
+		ap base.ProducerCallable
+		ar base.RemotingCallable
+		cs map[string]base.ConditionCallable
+		ds map[string]base.DispatcherCallable
+		rs map[string]base.ResultCallable
+		mu *sync.RWMutex
+	}
+)
 
 // GetConsumer
 // return consumer manager constructor.
@@ -46,10 +45,6 @@ func (o *container) GetRemoting() base.RemotingCallable { return o.ar }
 // SetRemoting
 // configure remoting manager constructor, singleton instance.
 func (o *container) SetRemoting(callable base.RemotingCallable) { o.ar = callable }
-
-// /////////////////////////////////////////////////////////////
-// Access methods
-// /////////////////////////////////////////////////////////////
 
 func (o *container) init() *container {
 	o.mu = &sync.RWMutex{}

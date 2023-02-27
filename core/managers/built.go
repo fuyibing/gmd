@@ -19,6 +19,7 @@ import (
 )
 
 var (
+	// 内建消费者.
 	builtInConsumer = map[base.Adapter]base.ConsumerCallable{
 		base.AliyunMns: func(id, parallel int, name string, process base.ConsumerProcess) base.ConsumerManager {
 			return aliyunmns.NewConsumer(id, parallel, name, process)
@@ -28,20 +29,24 @@ var (
 		},
 	}
 
+	// 内建生产者.
 	builtInProducer = map[base.Adapter]base.ProducerCallable{
 		base.AliyunMns: func() base.ProducerManager { return aliyunmns.NewProducer() },
 		base.RocketMq:  func() base.ProducerManager { return rocketmq.NewProducer() },
 	}
 
+	// 内建远程处理.
 	builtInRemoting = map[base.Adapter]base.RemotingCallable{
 		base.AliyunMns: func() base.RemotingManager { return aliyunmns.NewRemoting() },
 		base.RocketMq:  func() base.RemotingManager { return rocketmq.NewRemoting() },
 	}
 
+	// 内建条件校验.
 	buildInConditions = map[string]base.ConditionCallable{
 		base.ConditionEl: func() base.ConditionManager { return el.New() },
 	}
 
+	// 内建消息分发.
 	buildInDispatchers = map[string]base.DispatcherCallable{
 		base.DispatchHttpGet:      func() base.DispatcherManager { return http_get.New() },
 		base.DispatchHttpPostForm: func() base.DispatcherManager { return http_post_form.New() },
@@ -51,6 +56,7 @@ var (
 		base.DispatchWebsocket:    func() base.DispatcherManager { return wss.New() },
 	}
 
+	// 内建结果校验.
 	buildInResults = map[string]base.ResultCallable{
 		base.ResultHttpOk:        func() base.ResultManager { return http_ok.New() },
 		base.ResultJsonErrnoZero: func() base.ResultManager { return json_errno_zero.New() },

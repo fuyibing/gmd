@@ -5,26 +5,22 @@ package base
 
 type (
 	// ConditionCallable
-	// constructor for create ConditionManager instance.
+	// 条件管理器构造函数.
 	ConditionCallable func() ConditionManager
 
 	// ConditionManager
-	// validate received message should dispatcher to subscription
-	// handler or not.
+	// 条件管理器接口.
 	ConditionManager interface {
 		// Validate
-		// verify whether the message body matches the configuration.
+		// 条件校验.
 		//
-		// If the return value is true, it means that it does not match
-		// the specified configuration, and message needs to be ignored,
-		// otherwise needs to deliver to subscriber.
-		//
-		// If an error is returned, the message body verification error.
+		// 如果返回的 ignored 值为 true 表示消息不满足条件需要被忽略, 反之需分
+		// 发给订阅方, 如果返回的 err 值非 nil, 表示条件校验格式错误.
 		Validate(message *Message) (ignored bool, err error)
 	}
 )
 
-// Condition enums.
+// 条件枚举.
 
 const (
 	ConditionEl = "EL"

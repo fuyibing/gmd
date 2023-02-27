@@ -9,16 +9,16 @@ import (
 
 var (
 	// Pool
-	// instance of pool manager.
+	// 池管理.
 	Pool PoolManager
 )
 
 type (
 	// PoolManager
-	// interface of pool manager.
+	// 池管理器.
 	PoolManager interface {
 		// AcquireMessage
-		// acquire message instance from pool.
+		// 获取消息.
 		AcquireMessage() *Message
 
 		// AcquireNotification
@@ -30,7 +30,7 @@ type (
 		// AcquirePayload() *Payload
 
 		// ReleaseMessage
-		// release message instance to pool.
+		// 释放消息.
 		ReleaseMessage(x *Message)
 
 		// ReleaseNotification

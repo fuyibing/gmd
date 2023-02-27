@@ -13,30 +13,41 @@ type (
 	// Configuration
 	// 应用配置接口.
 	Configuration interface {
-		GetAdapter() string
 		GetHost() string
-		GetMemoryReloadSeconds() int
 		GetPort() int
+		GetName() string
+		GetVersion() string
+
+		GetAdapter() string
+		GetMemoryReloadSeconds() int
 		GetRocketmq() RocketmqConfiguration
 		GetStartedTime() time.Time
 	}
 
 	configuration struct {
+		Name    string `yaml:"name"`
+		Host    string `yaml:"host"`
+		Port    int    `yaml:"port"`
+		Version string `yaml:"version"`
+
 		Adapter             string                 `yaml:"adapter"`
 		AdapterRocketmq     *rocketmqConfiguration `yaml:"adapter-rocketmq"`
-		Host                string                 `yaml:"host"`
 		MemoryReloadSeconds int                    `yaml:"memory-reload-seconds"`
-		Port                int                    `yaml:"port"`
 		StartedTime         time.Time              `yaml:"-"`
 	}
 )
 
+func (o *configuration) GetName() string    { return o.Name }
+func (o *configuration) GetHost() string    { return o.Host }
+func (o *configuration) GetPort() int       { return o.Port }
+func (o *configuration) GetVersion() string { return o.Version }
+
+func (o *configuration) GetStartedTime() time.Time { return o.StartedTime }
+
 func (o *configuration) GetAdapter() string                 { return o.Adapter }
-func (o *configuration) GetHost() string                    { return "0.0.0.0" }
-func (o *configuration) GetMemoryReloadSeconds() int        { return o.MemoryReloadSeconds }
-func (o *configuration) GetPort() int                       { return 8101 }
 func (o *configuration) GetRocketmq() RocketmqConfiguration { return o.AdapterRocketmq }
-func (o *configuration) GetStartedTime() time.Time          { return o.StartedTime }
+
+func (o *configuration) GetMemoryReloadSeconds() int { return o.MemoryReloadSeconds }
 
 // /////////////////////////////////////////////////////////////
 // Configuration initialize
@@ -75,18 +86,4 @@ func (o *configuration) initYaml() {
 			}
 		}
 	}
-}
-
-// /////////////////////////////////////////////////////////////
-// Configuration setter
-// /////////////////////////////////////////////////////////////
-
-func SetAdapter(adapter string) Option {
-	return func(c *configuration) {
-		c.Adapter = adapter
-	}
-}
-
-func SetMemoryReloadSeconds(n int) Option {
-	return func(c *configuration) { c.MemoryReloadSeconds = n }
 }

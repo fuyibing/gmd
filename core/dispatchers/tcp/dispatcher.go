@@ -8,24 +8,14 @@ import (
 )
 
 // Dispatcher
-// dispatch message to subscriber.
+// 消息分发.
 type Dispatcher struct{}
 
-func New() *Dispatcher {
-	return (&Dispatcher{}).init()
-}
-
-// /////////////////////////////////////////////////////////////
-// Interface methods
-// /////////////////////////////////////////////////////////////
+func New() *Dispatcher { return (&Dispatcher{}).init() }
 
 func (o *Dispatcher) Dispatch(_ *base.Task, _ *base.Subscriber, _ *base.Message) (err error) {
 	return
 }
-
-// /////////////////////////////////////////////////////////////
-// Access methods
-// /////////////////////////////////////////////////////////////
 
 func (o *Dispatcher) init() *Dispatcher {
 	return o

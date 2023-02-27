@@ -8,22 +8,12 @@ import (
 )
 
 // Validation
-// verify message body.
+// 条件校验.
 type Validation struct{}
 
-func New() *Validation {
-	return (&Validation{}).init()
-}
-
-// /////////////////////////////////////////////////////////////
-// Interface methods
-// /////////////////////////////////////////////////////////////
+func New() *Validation { return (&Validation{}).init() }
 
 func (o *Validation) Validate(_ *base.Message) (ignored bool, err error) { return }
-
-// /////////////////////////////////////////////////////////////
-// Access methods
-// /////////////////////////////////////////////////////////////
 
 func (o *Validation) init() *Validation {
 	return o

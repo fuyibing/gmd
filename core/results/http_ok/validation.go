@@ -4,22 +4,12 @@
 package http_ok
 
 // Validation
-// verify dispatcher result.
+// 结果校验.
 type Validation struct{}
 
-func New() *Validation {
-	return (&Validation{}).init()
-}
-
-// /////////////////////////////////////////////////////////////
-// Interface methods
-// /////////////////////////////////////////////////////////////
+func New() *Validation { return (&Validation{}).init() }
 
 func (o *Validation) Validate(_ int, _ []byte) (err error) { return }
-
-// /////////////////////////////////////////////////////////////
-// Access methods
-// /////////////////////////////////////////////////////////////
 
 func (o *Validation) init() *Validation {
 	return o

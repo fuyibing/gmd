@@ -5,17 +5,19 @@ package base
 
 type (
 	// DispatcherCallable
-	// constructor for create DispatcherManager instance.
+	// 消费分发构造函数.
 	DispatcherCallable func() DispatcherManager
 
 	// DispatcherManager
-	// dispatch received message to subscription handler.
+	// 消费分发管理器.
 	DispatcherManager interface {
+		// Dispatch
+		// 分发过程.
 		Dispatch(task *Task, subscriber *Subscriber, message *Message) (err error)
 	}
 )
 
-// Dispatcher enums.
+// 分发类型枚举.
 
 const (
 	DispatchHttpGet      = "HTTP_GET"

@@ -9,54 +9,62 @@ import (
 
 type (
 	// Adapter
-	// defined for mq middlewares name.
+	// 适配器名称.
 	Adapter string
 
-	// ConsumerProcess
-	// message consume process.
-	//
-	// Call this handler when message received from mq.
-	//
-	// If the ignored value is true, it means that the message is ignored
-	// because the consumption condition is not met.
-	ConsumerProcess func(task *Task, message *Message) (ignored bool, err error)
-
 	// ConsumerCallable
-	// constructor for create ConsumerManager instance.
+	// MQ中间件的消费者构造函数.
 	ConsumerCallable func(id, parallel int, name string, process ConsumerProcess) ConsumerManager
 
 	// ConsumerManager
-	// receive message from queue of mq middleware server.
+	// MQ中间件的消费者管理器.
 	ConsumerManager interface {
+		// Processor
+		// 获取执行器.
 		Processor() process.Processor
 	}
 
+	// ConsumerProcess
+	// 消息执行器.
+	//
+	// 当从MQ队列(AliyunMNS, RocketMQ等)收到消息时, 通过此执行器处理消费过程.
+	//
+	// 若返回的 ignored 值为 true, 表示消息不满足投递条件(条件校验)被忽略了, 反之
+	// 需分发给订阅方. 若返回的 err 值非空, 则表示条件校验出错.
+	ConsumerProcess func(task *Task, message *Message) (ignored bool, err error)
+
 	// ProducerCallable
-	// constructor for create ProducerManager instance.
+	// MQ中间件的生产者构造函数.
 	ProducerCallable func() ProducerManager
 
 	// ProducerManager
-	// publish message to mq middleware server.
+	// MQ中间件的生产者管理器.
 	ProducerManager interface {
+		// Processor
+		// 获取执行器.
 		Processor() process.Processor
 	}
 
 	// RemotingCallable
-	// constructor for create RemotingManager instance.
+	// MQ中间件的服务商构造函数.
 	RemotingCallable func() RemotingManager
 
 	// RemotingManager
-	// manager remote with mq middleware server.
+	// MQ中间件的服务端管理器.
 	RemotingManager interface {
+		// Processor
+		// 获取执行器.
 		Processor() process.Processor
 	}
 )
 
-// Adapter enums.
+// 适配器枚举.
 
 const (
 	AliyunMns Adapter = "aliyunmns"
 	RocketMq  Adapter = "rocketmq"
 )
 
-func (adapter Adapter) String() {}
+// String
+// 适配器名称.
+func (a Adapter) String() string { return string(a) }

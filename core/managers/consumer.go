@@ -14,19 +14,19 @@ import (
 	"time"
 )
 
-type Consumer struct {
-	callable  base.ConsumerCallable
-	name      string
-	processor process.Processor
+type (
+	// Consumer
+	// 消费者管理器.
+	Consumer struct {
+		callable  base.ConsumerCallable
+		name      string
+		processor process.Processor
 
-	mu           *sync.RWMutex
-	subprocesses map[string]int
-	updates      map[int]int64
-}
-
-// /////////////////////////////////////////////////////////////
-// Exported methods
-// /////////////////////////////////////////////////////////////
+		mu           *sync.RWMutex
+		subprocesses map[string]int
+		updates      map[int]int64
+	}
+)
 
 func (o *Consumer) DoConsume(_ *base.Task, _ *base.Message) (retry bool, err error) {
 	return
@@ -34,7 +34,7 @@ func (o *Consumer) DoConsume(_ *base.Task, _ *base.Message) (retry bool, err err
 
 func (o *Consumer) DoMemoryReload() {
 	var (
-		c   = log.Manager.NewTrace("consumer")
+		c   = log.NewTrace("consumer")
 		cs  = c.NewSpan("consumer.memory.reload")
 		err error
 	)
@@ -84,10 +84,6 @@ func (o *Consumer) DoSubprocess() {
 		o.unloadSubprocess(rm)
 	}
 }
-
-// /////////////////////////////////////////////////////////////
-// Processor events
-// /////////////////////////////////////////////////////////////
 
 func (o *Consumer) OnAfter(_ context.Context) (ignored bool) {
 	return
@@ -141,10 +137,6 @@ func (o *Consumer) OnCallSubprocessLoad(_ context.Context) (ignored bool) {
 func (o *Consumer) OnPanic(ctx context.Context, v interface{}) {
 	// log.Panicfc(ctx, "processor {%s} fatal: %v", o.name, v)
 }
-
-// /////////////////////////////////////////////////////////////
-// Access methods
-// /////////////////////////////////////////////////////////////
 
 func (o *Consumer) init() *Consumer {
 	o.mu = &sync.RWMutex{}

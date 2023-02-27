@@ -10,7 +10,7 @@ import (
 )
 
 // Registry
-// config topic name and tag relation.
+// 注册组合.
 type Registry struct {
 	Id        int
 	TopicName string
@@ -18,17 +18,11 @@ type Registry struct {
 	FilterTag string
 }
 
-// /////////////////////////////////////////////////////////////
-// Access methods.
-// /////////////////////////////////////////////////////////////
-
 func (o *Registry) init(m *models.Registry) *Registry {
-	// Basic fields.
 	o.Id = m.Id
 	o.TopicName = strings.ToUpper(m.TopicName)
 	o.TopicTag = strings.ToUpper(m.TopicTag)
 
-	// Execution field.
 	if o.FilterTag = strings.ToUpper(m.FilterTag); o.FilterTag == "" {
 		o.FilterTag = fmt.Sprintf("T%d", m.Id)
 	}

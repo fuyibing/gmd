@@ -13,19 +13,23 @@ import (
 
 type (
 	// BootManager
-	// core process manager.
+	// 入口管理器.
 	BootManager interface {
 		// Restart
-		// boot processor.
+		// 重启Processor.
 		Restart()
 
 		// Start
-		// boot processor.
+		// 启动Processor.
 		Start(ctx context.Context) error
 
 		// Stop
-		// boot processor.
+		// 退出Processor.
 		Stop()
+
+		// Stopped
+		// 退出状态.
+		Stopped() bool
 	}
 
 	boot struct {
@@ -39,17 +43,10 @@ type (
 	}
 )
 
-// /////////////////////////////////////////////////////////////
-// Interface methods
-// /////////////////////////////////////////////////////////////
-
 func (o *boot) Restart()                        { o.processor.Restart() }
 func (o *boot) Start(ctx context.Context) error { return o.processor.Start(ctx) }
 func (o *boot) Stop()                           { o.processor.Stop() }
-
-// /////////////////////////////////////////////////////////////
-// Processor events
-// /////////////////////////////////////////////////////////////
+func (o *boot) Stopped() bool                   { return o.processor.Stopped() }
 
 func (o *boot) OnAfter(_ context.Context) (ignored bool) {
 	return
@@ -93,10 +90,6 @@ func (o *boot) OnPanic(ctx context.Context, v interface{}) {
 	}
 }
 
-// /////////////////////////////////////////////////////////////
-// Access methods
-// /////////////////////////////////////////////////////////////
-
 func (o *boot) init() *boot {
 	o.consumer = (&Consumer{}).init()
 	o.producer = (&Producer{}).init()
@@ -122,10 +115,6 @@ func (o *boot) init() *boot {
 
 	return o
 }
-
-// /////////////////////////////////////////////////////////////
-// Package init
-// /////////////////////////////////////////////////////////////
 
 var (
 	Boot      BootManager

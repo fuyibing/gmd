@@ -4,6 +4,8 @@
 package base
 
 type (
+	// Subscriber
+	// 订阅器.
 	Subscriber struct {
 		// Subscriber handler.
 		//

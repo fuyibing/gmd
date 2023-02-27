@@ -42,7 +42,9 @@ func New(i iris.Context, logics ...Logic) (res interface{}) {
 	var (
 		req = i.Request()
 		tra = log.NewTraceFromRequest(req, req.RequestURI)
-		spa = tra.NewSpan(req.RequestURI)
+		spa = tra.NewSpan(
+			fmt.Sprintf("%s %s %s", req.Proto, req.Method, req.RequestURI),
+		)
 	)
 
 	// 请求结束.
@@ -56,7 +58,7 @@ func New(i iris.Context, logics ...Logic) (res interface{}) {
 
 		// 记录结果.
 		buf, _ := json.Marshal(res)
-		spa.Logger().Info("response body: %s", buf)
+		spa.Logger().Info("http.response.body: %s", buf)
 		spa.End()
 
 		// 链路下探.
@@ -69,7 +71,7 @@ func New(i iris.Context, logics ...Logic) (res interface{}) {
 		case http.MethodPost, http.MethodPut:
 			if b, be := i.GetBody(); be == nil {
 				if s := fmt.Sprintf("%s", b); s != "" {
-					spa.Logger().Info("request body: %s", regexp.MustCompile(`\n\s*`).ReplaceAllString(s, ""))
+					spa.Logger().Info("http.request.body: %s", regexp.MustCompile(`\n\s*`).ReplaceAllString(s, ""))
 				}
 			}
 		}

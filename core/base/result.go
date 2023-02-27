@@ -5,20 +5,19 @@ package base
 
 type (
 	// ResultCallable
-	// constructor for create ResultManager instance.
+	// 结果校验构造函数.
 	ResultCallable func() ResultManager
 
 	// ResultManager
-	// validate dispatcher result from subscription handler
-	// is succeed or failed.
+	// 结果校验管理器.
 	ResultManager interface {
 		// Validate
-		// verify dispatcher result.
+		// 校验结果.
 		Validate(code int, body []byte) (err error)
 	}
 )
 
-// Result enums.
+// 结果类型枚举.
 
 const (
 	ResultHttpOk        = "HttpStatusOk"

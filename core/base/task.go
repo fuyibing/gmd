@@ -8,7 +8,7 @@ import (
 )
 
 // Task
-// subscription for mq middleware server.
+// 订阅任务.
 type Task struct {
 	Id      int
 	Title   string
@@ -35,10 +35,6 @@ type Task struct {
 	SuccessNotify     bool
 	SuccessSubscriber *Subscriber
 }
-
-// /////////////////////////////////////////////////////////////
-// Access methods.
-// /////////////////////////////////////////////////////////////
 
 func (o *Task) bind(r *Registry) *Task {
 	o.FilterTag = r.FilterTag

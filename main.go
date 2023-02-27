@@ -5,54 +5,154 @@ package main
 
 import (
 	"context"
-	"github.com/fuyibing/gmd/v8/core/managers"
+	"fmt"
+	cs "github.com/fuyibing/console/v3"
+	cm "github.com/fuyibing/console/v3/managers"
+	"github.com/fuyibing/gmd/v8/app"
+	"github.com/fuyibing/gmd/v8/app/controllers"
+	"github.com/fuyibing/gmd/v8/app/middlewares"
 	"github.com/fuyibing/log/v5"
-	"time"
+	"github.com/kataras/iris/v12"
+	"github.com/kataras/iris/v12/middleware/pprof"
+	"github.com/kataras/iris/v12/mvc"
+	"os"
 )
 
-func init() {
-	// log.Manager.LoggerManager().SetExporter(logger_term.NewExporter())
-	// log.Manager.TracerManager().SetExporter(tracer_jaeger.NewExporter())
-	go func() {
-		log.Manager.Start(context.Background())
-	}()
+var (
+	ctx context.Context
+	err error
+	mng cm.Manager
+	my  *gmd
+)
 
+type (
+	// gmd
+	// golang message dispatcher.
+	gmd struct {
+		cancel context.CancelFunc
+		cmd    cm.Command
+		ctx    context.Context
+
+		framework *iris.Application
+	}
+)
+
+func (o *gmd) error(text string, args ...interface{}) {
+	_, _ = fmt.Fprintf(os.Stderr, fmt.Sprintf(text, args...))
 }
 
-func main() {
-	var (
-		cancel context.CancelFunc
-		ctx    context.Context
-		err    error
+// init
+// 构造项目.
+func (o *gmd) init() *gmd {
+	o.cmd = cm.NewCommand("start").
+		SetDescription("start gmd service").
+		SetHandler(o.run)
+	return o
+}
+
+// initFramework
+// 初始化IRIS框架.
+func (o *gmd) initFramework() {
+	o.framework = iris.New()
+	o.framework.Logger().SetLevel("disable")
+	o.framework.Configure(iris.WithConfiguration(iris.Configuration{
+		DisableBodyConsumptionOnUnmarshal: true,
+		DisableStartupLog:                 true,
+		EnableOptimizations:               true,
+		TimeFormat:                        "2006-01-02 15:04:05",
+	}))
+
+	o.framework.OnAnyErrorCode(middlewares.ErrCode)
+}
+
+// initFrameworkControllers
+// 注册MVC控制器.
+func (o *gmd) initFrameworkControllers() {
+	for k, c := range controllers.Containers {
+		func(key string, controller interface{}) {
+			mvc.Configure(o.framework.Party(key), func(application *mvc.Application) {
+				application.Handle(controller)
+			})
+		}(k, c)
+	}
+}
+
+// initFrameworkMiddlewares
+// 注册中间件.
+func (o *gmd) initFrameworkMiddlewares() {
+	o.framework.Use(
+		middlewares.Tracer,
+		middlewares.Panic,
 	)
+}
 
-	defer func() {
-		if err != nil {
-			log.Error("main error: %v", err)
-		}
+func (o *gmd) initFrameworkProfiles() {
+	p := pprof.New()
+	o.framework.Any("/debug/pprof", p)
+	o.framework.Any("/debug/pprof/{action:path}", p)
+}
 
-		if ctx != nil && ctx.Err() == nil {
-			cancel()
-		}
+// run
+// 执行项目.
+func (o *gmd) run(_ cm.Manager, _ cm.Arguments) error {
+	iris.RegisterOnInterrupt(o.runInterrupt)
 
-		managers.Boot.Stop()
+	o.initFramework()
+	o.initFrameworkMiddlewares()
+	o.initFrameworkControllers()
+	o.initFrameworkProfiles()
 
-		log.Manager.Stop()
-	}()
+	// 启动服务.
+	o.runServe()
 
+	// 卸载日志, 阻塞协程直到全部上报完成.
+	log.Manager.Stop()
+	return nil
+}
+
+// 加载内核.
+func (o *gmd) runBeforeLoadCore(_ *iris.Application) {}
+
+// 加载日志.
+func (o *gmd) runBeforeLoadLogger(_ *iris.Application) {
 	go func() {
-		time.Sleep(time.Second * 35)
-		if err == nil {
-
-			// log.Warn("------ call restart")
-			// managers.Boot.Restart()
-
-			// time.Sleep(time.Second * 5)
-			log.Warn("------ call canceller")
-			cancel()
+		if el := log.Manager.Start(ctx); el != nil {
+			_, _ = fmt.Fprintf(os.Stderr, fmt.Sprintf("%v", el))
 		}
 	}()
+}
 
-	ctx, cancel = context.WithCancel(context.Background())
-	err = managers.Boot.Start(ctx)
+func (o *gmd) runInterrupt() {
+}
+
+func (o *gmd) runServe() {
+	if err = o.framework.Configure(
+		o.runBeforeLoadLogger,
+		o.runBeforeLoadCore,
+	).Run(
+		iris.Addr(fmt.Sprintf("%s:%d", app.Config.GetHost(), app.Config.GetPort())),
+	); err != nil {
+		log.Error("%v", err)
+	}
+}
+
+// init
+// 项目构造.
+func init() {
+	if mng, err = cs.New(); err == nil {
+		my = (&gmd{}).init()
+		err = mng.AddCommand(my.cmd)
+	}
+}
+
+// main
+// 项目执行.
+func main() {
+	if err == nil {
+		ctx = context.Background()
+		err = mng.RunTerminal()
+	}
+	if err != nil {
+		my.error("%v", err)
+	}
 }

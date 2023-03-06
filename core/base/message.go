@@ -4,7 +4,9 @@
 package base
 
 // Message
-// 从MQ队列收到的消息.
+// 消息结构.
+//
+// 从MQ队列收到的消息 或 本地存储的历史消息.
 type Message struct {
 }
 

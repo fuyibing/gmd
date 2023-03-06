@@ -74,8 +74,6 @@ func (o *Task) initFields(m *models.Task) {
 	}
 }
 
-func (o *Task) initSubscriber(_ *models.Task) {
-}
+func (o *Task) initSubscriber(_ *models.Task) {}
 
-func (o *Task) initStatus() {
-}
+func (o *Task) initStatus() {}

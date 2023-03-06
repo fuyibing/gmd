@@ -13,8 +13,6 @@ import (
 	"github.com/fuyibing/gmd/v8/app/middlewares"
 	"github.com/fuyibing/gmd/v8/core/managers"
 	"github.com/fuyibing/log/v5"
-	"github.com/fuyibing/log/v5/conf"
-	"github.com/fuyibing/log/v5/cores"
 	"github.com/kataras/iris/v12"
 	"github.com/kataras/iris/v12/middleware/pprof"
 	"github.com/kataras/iris/v12/mvc"
@@ -29,17 +27,12 @@ var (
 	my  *gmd
 )
 
-type (
-	// gmd
-	// golang message dispatcher.
-	gmd struct {
-		cancel context.CancelFunc
-		cmd    cm.Command
-		ctx    context.Context
-
-		framework *iris.Application
-	}
-)
+type gmd struct {
+	cancel    context.CancelFunc
+	cmd       cm.Command
+	ctx       context.Context
+	framework *iris.Application
+}
 
 func (o *gmd) error(text string, args ...interface{}) {
 	_, _ = fmt.Fprintf(os.Stderr, fmt.Sprintf(text, args...))
@@ -106,7 +99,6 @@ func (o *gmd) run(_ cm.Manager, _ cm.Arguments) error {
 	o.initFrameworkControllers()
 	o.initFrameworkProfiles()
 
-	// 启动服务.
 	o.runServe()
 
 	// 卸载日志, 阻塞协程直到全部上报完成.
@@ -122,22 +114,12 @@ func (o *gmd) runBeforeLoadCore(_ *iris.Application) {
 
 // 加载日志.
 func (o *gmd) runBeforeLoadLogger(_ *iris.Application) {
-	go func() {
-		// 覆盖配置.
-		conf.Config.With(
-			conf.ServiceName(app.Config.GetName()),
-			conf.ServicePort(app.Config.GetPort()),
-			conf.ServiceVersion(app.Config.GetVersion()),
-		)
+	log.Manager.Tracer().GetResource().
+		Add("service.name", app.Config.GetName()).
+		Add("service.port", app.Config.GetPort()).
+		Add("service.version", app.Config.GetVersion())
 
-		// 更新资源.
-		cores.Registry.Update()
-
-		// 启动日志.
-		if el := log.Manager.Start(ctx); el != nil {
-			_, _ = fmt.Fprintf(os.Stderr, fmt.Sprintf("%v", el))
-		}
-	}()
+	log.Manager.Start(ctx)
 }
 
 func (o *gmd) runInterrupt() {

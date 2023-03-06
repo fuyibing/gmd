@@ -15,21 +15,12 @@ type (
 	// BootManager
 	// 入口管理器.
 	BootManager interface {
-		// Restart
-		// 重启Processor.
 		Restart()
-
-		// Start
-		// 启动Processor.
 		Start(ctx context.Context) error
-
-		// Stop
-		// 退出Processor.
 		Stop()
-
-		// Stopped
-		// 退出状态.
 		Stopped() bool
+
+		Producer() *Producer
 	}
 
 	boot struct {
@@ -43,33 +34,32 @@ type (
 	}
 )
 
+// /////////////////////////////////////////////////////////////////////////////
+// Interface methods
+// /////////////////////////////////////////////////////////////////////////////
+
 func (o *boot) Restart()                        { o.processor.Restart() }
 func (o *boot) Start(ctx context.Context) error { return o.processor.Start(ctx) }
 func (o *boot) Stop()                           { o.processor.Stop() }
 func (o *boot) Stopped() bool                   { return o.processor.Stopped() }
 
-func (o *boot) OnAfter(_ context.Context) (ignored bool) {
-	return
-}
+func (o *boot) Producer() *Producer { return o.producer }
 
-func (o *boot) OnBefore(_ context.Context) (ignored bool) {
-	return
-}
+// /////////////////////////////////////////////////////////////////////////////
+// Event methods
+// /////////////////////////////////////////////////////////////////////////////
 
 func (o *boot) OnBeforeMemory(ctx context.Context) (ignored bool) {
 	var (
-		trace = log.NewTraceFromContext(ctx, "memory")
-		span  = trace.NewSpan("boot.memory.update")
+		span = log.NewSpanFromContext(ctx, "memory")
 	)
 
 	defer span.End()
 
-	if err := base.Memory.Reload(span.GetContext()); err != nil {
+	if err := base.Memory.Reload(span.Context()); err != nil {
 		span.Logger().Error("%v", err)
 		return true
 	}
-
-	span.Logger().Info("succeed")
 	return
 }
 
@@ -83,12 +73,16 @@ func (o *boot) OnCall(ctx context.Context) (ignored bool) {
 }
 
 func (o *boot) OnPanic(ctx context.Context, v interface{}) {
-	if sp, spe := log.Span(ctx); spe {
-		sp.Logger().Fatal("processor {%s} fatal: %v", o.name, v)
+	if spa, exists := log.Span(ctx); exists {
+		spa.Logger().Fatal("<%s> %v", o.name, v)
 	} else {
-		log.Fatal("processor {%s} fatal: %v", o.name, v)
+		log.Fatal("<%s> %v", o.name, v)
 	}
 }
+
+// /////////////////////////////////////////////////////////////////////////////
+// Access and constructor
+// /////////////////////////////////////////////////////////////////////////////
 
 func (o *boot) init() *boot {
 	o.consumer = (&Consumer{}).init()
@@ -97,18 +91,14 @@ func (o *boot) init() *boot {
 	o.retry = (&Retry{}).init()
 
 	o.name = "boot-manager"
-	o.processor = process.New(o.name).After(
-		o.OnAfter,
-	).Before(
-		o.OnBefore,
-		o.OnBeforeMemory,
-	).Callback(
-		o.OnCall,
-	).Panic(o.OnPanic)
+	o.processor = process.New(o.name).
+		Before(o.OnBeforeMemory).
+		Callback(o.OnCall).
+		Panic(o.OnPanic)
 
 	o.processor.Add(
-		o.consumer.processor,
-		// o.producer.processor,
+		// o.consumer.processor,
+		o.producer.processor,
 		// o.remoting.processor,
 		// o.retry.processor,
 	)

@@ -5,11 +5,11 @@ package base
 
 type (
 	// ResultCallable
-	// 结果校验构造函数.
+	// 结果构造.
 	ResultCallable func() ResultManager
 
 	// ResultManager
-	// 结果校验管理器.
+	// 结果管理器.
 	ResultManager interface {
 		// Validate
 		// 校验结果.

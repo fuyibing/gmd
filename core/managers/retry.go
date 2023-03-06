@@ -5,6 +5,7 @@ package managers
 
 import (
 	"context"
+	"github.com/fuyibing/log/v5"
 	"github.com/fuyibing/util/v8/process"
 )
 
@@ -35,7 +36,11 @@ func (o *Retry) OnCall(ctx context.Context) (ignored bool) {
 }
 
 func (o *Retry) OnPanic(ctx context.Context, v interface{}) {
-	// log.Panicfc(ctx, "processor {%s} fatal: %v", o.name, v)
+	if spa, exists := log.Span(ctx); exists {
+		spa.Logger().Fatal("<%s> %v", o.name, v)
+	} else {
+		log.Fatal("<%s> %v", o.name, v)
+	}
 }
 
 func (o *Retry) init() *Retry {

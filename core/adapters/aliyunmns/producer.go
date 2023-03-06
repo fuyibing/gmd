@@ -5,6 +5,7 @@ package aliyunmns
 
 import (
 	"context"
+	"github.com/fuyibing/gmd/v8/core/base"
 	"github.com/fuyibing/util/v8/process"
 )
 
@@ -26,6 +27,10 @@ func NewProducer() *Producer {
 // /////////////////////////////////////////////////////////////
 
 func (o *Producer) Processor() process.Processor { return o.processor }
+
+func (o *Producer) Publish(v *base.Payload) (messageId string, error error) {
+	return
+}
 
 // /////////////////////////////////////////////////////////////
 // Processor events

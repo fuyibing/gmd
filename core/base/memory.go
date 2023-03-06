@@ -24,31 +24,31 @@ type (
 	// 内存管理器.
 	MemoryManager interface {
 		// GetRegistries
-		// 获取注册组合列表.
+		// 注册组合列表.
 		GetRegistries() map[int]*Registry
 
 		// GetRegistry
-		// 获取注册组合.
+		// 注册组合.
 		GetRegistry(id int) *Registry
 
 		// GetRegistryByName
-		// 获取订阅任务.
+		// 订阅任务.
 		GetRegistryByName(topic, tag string) *Registry
 
 		// GetTask
-		// 获取订阅任务.
+		// 订阅任务.
 		GetTask(id int) *Task
 
 		// GetTaskFromBean
-		// 获取订阅任务.
+		// 订阅任务.
 		GetTaskFromBean(ctx context.Context, id int) (task *Task, err error)
 
 		// GetTasks
-		// 获取订阅任务列表.
+		// 订阅任务列表.
 		GetTasks() map[int]*Task
 
 		// Reload
-		// 重新加载内存.
+		// 重新加载.
 		Reload(c context.Context) error
 	}
 
@@ -63,12 +63,14 @@ type (
 func (o *memory) GetRegistries() map[int]*Registry {
 	o.mu.RLock()
 	defer o.mu.RUnlock()
+
 	return o.registryMapper
 }
 
 func (o *memory) GetRegistry(id int) *Registry {
 	o.mu.RLock()
 	defer o.mu.RUnlock()
+
 	if v, ok := o.registryMapper[id]; ok {
 		return v
 	}
@@ -76,9 +78,11 @@ func (o *memory) GetRegistry(id int) *Registry {
 }
 
 func (o *memory) GetRegistryByName(topic, tag string) *Registry {
-	key := o.key(topic, tag)
 	o.mu.RLock()
 	defer o.mu.RUnlock()
+
+	key := o.key(topic, tag)
+
 	if id, exists := o.registryKey[key]; exists {
 		if v, ok := o.registryMapper[id]; ok {
 			return v
@@ -90,6 +94,7 @@ func (o *memory) GetRegistryByName(topic, tag string) *Registry {
 func (o *memory) GetTask(id int) *Task {
 	o.mu.RLock()
 	defer o.mu.RUnlock()
+
 	if v, ok := o.taskMapper[id]; ok {
 		return v
 	}
@@ -101,7 +106,6 @@ func (o *memory) GetTaskFromBean(ctx context.Context, id int) (task *Task, err e
 		bean *models.Task
 		sess = db.Connector.GetSlaveWithContext(ctx)
 	)
-
 	if bean, err = services.NewTaskService(sess).GetById(id); err != nil || bean == nil {
 		return
 	}
@@ -114,6 +118,7 @@ func (o *memory) GetTaskFromBean(ctx context.Context, id int) (task *Task, err e
 func (o *memory) GetTasks() map[int]*Task {
 	o.mu.RLock()
 	defer o.mu.RUnlock()
+
 	return o.taskMapper
 }
 

@@ -17,6 +17,7 @@ package controllers
 
 import (
 	"github.com/fuyibing/gmd/v8/app/controllers/task"
+	"github.com/fuyibing/gmd/v8/app/controllers/topic"
 	"sync"
 )
 
@@ -27,8 +28,9 @@ var (
 func init() {
 	new(sync.Once).Do(func() {
 		Containers = map[string]interface{}{
-			"/":     &Controller{},
-			"/task": &task.Controller{},
+			"/":      &Controller{},
+			"/task":  &task.Controller{},
+			"/topic": &topic.Controller{},
 		}
 	})
 }

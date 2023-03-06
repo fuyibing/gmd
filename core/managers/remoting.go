@@ -6,6 +6,7 @@ package managers
 import (
 	"context"
 	"github.com/fuyibing/gmd/v8/core/base"
+	"github.com/fuyibing/log/v5"
 	"github.com/fuyibing/util/v8/process"
 )
 
@@ -60,7 +61,11 @@ func (o *Remoting) OnCallListen(ctx context.Context) (ignored bool) {
 }
 
 func (o *Remoting) OnPanic(ctx context.Context, v interface{}) {
-	// log.Panicfc(ctx, "processor {%s} fatal: %v", o.name, v)
+	if spa, exists := log.Span(ctx); exists {
+		spa.Logger().Fatal("<%s> %v", o.name, v)
+	} else {
+		log.Fatal("<%s> %v", o.name, v)
+	}
 }
 
 func (o *Remoting) init() *Remoting {

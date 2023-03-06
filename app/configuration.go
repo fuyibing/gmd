@@ -22,6 +22,8 @@ type (
 		GetMemoryReloadSeconds() int
 		GetRocketmq() RocketmqConfiguration
 		GetStartedTime() time.Time
+
+		ConfigurationProducer
 	}
 
 	configuration struct {
@@ -30,10 +32,13 @@ type (
 		Port    int    `yaml:"port"`
 		Version string `yaml:"version"`
 
-		Adapter             string                 `yaml:"adapter"`
-		AdapterRocketmq     *rocketmqConfiguration `yaml:"adapter-rocketmq"`
-		MemoryReloadSeconds int                    `yaml:"memory-reload-seconds"`
-		StartedTime         time.Time              `yaml:"-"`
+		Adapter         string                 `yaml:"adapter"`
+		AdapterRocketmq *rocketmqConfiguration `yaml:"adapter-rocketmq"`
+
+		Producer *producerConfiguration `yaml:"producer"`
+
+		MemoryReloadSeconds int       `yaml:"memory-reload-seconds"`
+		StartedTime         time.Time `yaml:"-"`
 	}
 )
 
@@ -73,6 +78,14 @@ func (o *configuration) initExtensions() {
 		o.AdapterRocketmq = &rocketmqConfiguration{}
 	}
 	o.AdapterRocketmq.initDefaults()
+
+	// 消费者.
+
+	// 生产者.
+	if o.Producer == nil {
+		o.Producer = &producerConfiguration{}
+	}
+	o.Producer.initDefaults()
 }
 
 func (o *configuration) initYaml() {

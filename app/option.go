@@ -10,9 +10,7 @@ type (
 )
 
 func SetAdapter(adapter string) Option {
-	return func(c *configuration) {
-		c.Adapter = adapter
-	}
+	return func(c *configuration) { c.Adapter = adapter }
 }
 
 func SetMemoryReloadSeconds(n int) Option {

@@ -8,27 +8,27 @@ type (
 	// 容器管理器.
 	ContainerManager interface {
 		// GetConsumer
-		// 获取MQ中间件的消费者构造函数.
+		// 消费者构造.
 		GetConsumer() (callable ConsumerCallable)
 
 		// SetConsumer
-		// 设置MQ中间件的消费者构造函数.
+		// 设置消费者构造.
 		SetConsumer(callable ConsumerCallable)
 
 		// GetProducer
-		// 获取MQ中间件的生产者构造函数.
+		// 生产者构造.
 		GetProducer() (callable ProducerCallable)
 
 		// SetProducer
-		// 设置MQ中间件的生产者构造函数.
+		// 设置生产者构造.
 		SetProducer(callable ProducerCallable)
 
 		// GetRemoting
-		// 获取MQ中间件的服务端构造函数.
+		// 服务端构造.
 		GetRemoting() (callable RemotingCallable)
 
 		// SetRemoting
-		// 设置MQ中间件的服务端构造函数.
+		// 设置服务端构造.
 		SetRemoting(callable RemotingCallable)
 	}
 )

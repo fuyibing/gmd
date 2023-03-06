@@ -22,7 +22,7 @@ import (
 	"github.com/fuyibing/gmd/v8/app"
 	"github.com/fuyibing/gmd/v8/app/models"
 	"github.com/fuyibing/gmd/v8/app/services"
-	"github.com/fuyibing/log/v5/cores"
+	"github.com/fuyibing/log/v5/tracers"
 	"github.com/fuyibing/util/v8/web/request"
 	"github.com/fuyibing/util/v8/web/response"
 	"github.com/kataras/iris/v12"
@@ -56,7 +56,7 @@ func NewEnable() *Enable {
 	}
 }
 
-func (o *Enable) Run(s cores.Span, i iris.Context) (res interface{}) {
+func (o *Enable) Run(s tracers.Span, i iris.Context) (res interface{}) {
 	var (
 		code int
 		err  error
@@ -73,8 +73,8 @@ func (o *Enable) Run(s cores.Span, i iris.Context) (res interface{}) {
 		return response.With.ErrorCode(err, app.CodeInvalidPayloadFields)
 	}
 
-	s.GetAttr().Add("task-id", o.request.Id)
-	if code, err = o.Send(s.GetContext()); err != nil {
+	s.Kv().Add("task-id", o.request.Id)
+	if code, err = o.Send(s.Context()); err != nil {
 		return response.With.ErrorCode(err, code)
 	}
 	return response.With.Data(o.response)

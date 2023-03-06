@@ -2,6 +2,10 @@
 # log-trace
 #
 
+service-name: "gmd"
+service-port: 8101
+service-version: 1.0
+
 # Logger
 logger-exporter: "term"
 logger-level: debug

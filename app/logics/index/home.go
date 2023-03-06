@@ -17,7 +17,7 @@ package index
 
 import (
 	"github.com/fuyibing/gmd/v8/app"
-	"github.com/fuyibing/log/v5/cores"
+	"github.com/fuyibing/log/v5/tracers"
 	"github.com/fuyibing/util/v8/web/response"
 	"github.com/kataras/iris/v12"
 	"time"
@@ -45,6 +45,6 @@ func NewHome() *Home {
 	}
 }
 
-func (o *Home) Run(_ cores.Span, _ iris.Context) interface{} {
+func (o *Home) Run(_ tracers.Span, _ iris.Context) interface{} {
 	return response.With.Data(o.response)
 }

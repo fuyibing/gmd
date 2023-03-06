@@ -19,7 +19,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/fuyibing/log/v5"
-	"github.com/fuyibing/log/v5/cores"
+	"github.com/fuyibing/log/v5/tracers"
 	"github.com/fuyibing/util/v8/web/response"
 	"github.com/kataras/iris/v12"
 	"net/http"
@@ -29,7 +29,7 @@ import (
 type (
 	// Logic
 	// 业务逻辑接口.
-	Logic func(s cores.Span, i iris.Context) interface{}
+	Logic func(s tracers.Span, i iris.Context) interface{}
 )
 
 // New
@@ -41,9 +41,8 @@ type (
 func New(i iris.Context, logics ...Logic) (res interface{}) {
 	var (
 		req = i.Request()
-		tra = log.NewTraceFromRequest(req, req.RequestURI)
-		spa = tra.NewSpan(
-			fmt.Sprintf("%s %s %s", req.Proto, req.Method, req.RequestURI),
+		spa = log.NewSpanFromRequest(i.Request(),
+			fmt.Sprintf("%s{%s}", req.Method, req.URL.Path),
 		)
 	)
 

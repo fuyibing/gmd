@@ -7,8 +7,8 @@ require (
 	github.com/apache/rocketmq-client-go/v2 v2.1.1
 	github.com/fasthttp-contrib/websocket v0.0.0-20160511215533-1f3b11f56072 // indirect
 	github.com/fuyibing/console/v3 v3.1.4
-	github.com/fuyibing/db/v5 v5.1.4
-	github.com/fuyibing/log/v5 v5.1.3
+	github.com/fuyibing/db/v5 v5.1.5
+	github.com/fuyibing/log/v5 v5.1.12
 	github.com/fuyibing/util/v8 v8.0.8
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/uuid v1.3.0

@@ -5,14 +5,14 @@ package base
 
 type (
 	// DispatcherCallable
-	// 消费分发构造函数.
+	// 分发器构造.
 	DispatcherCallable func() DispatcherManager
 
 	// DispatcherManager
-	// 消费分发管理器.
+	// 分发管理器.
 	DispatcherManager interface {
 		// Dispatch
-		// 分发过程.
+		// 执行分发.
 		Dispatch(task *Task, subscriber *Subscriber, message *Message) (err error)
 	}
 )

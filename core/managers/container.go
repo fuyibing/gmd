@@ -9,18 +9,16 @@ import (
 	"sync"
 )
 
-type (
-	// 适配器容器.
-	container struct {
-		ac base.ConsumerCallable
-		ap base.ProducerCallable
-		ar base.RemotingCallable
-		cs map[string]base.ConditionCallable
-		ds map[string]base.DispatcherCallable
-		rs map[string]base.ResultCallable
-		mu *sync.RWMutex
-	}
-)
+// 适配器容器.
+type container struct {
+	ac base.ConsumerCallable
+	ap base.ProducerCallable
+	ar base.RemotingCallable
+	cs map[string]base.ConditionCallable
+	ds map[string]base.DispatcherCallable
+	rs map[string]base.ResultCallable
+	mu *sync.RWMutex
+}
 
 // GetConsumer
 // return consumer manager constructor.

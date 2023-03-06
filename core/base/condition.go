@@ -5,11 +5,11 @@ package base
 
 type (
 	// ConditionCallable
-	// 条件管理器构造函数.
+	// 条件构造.
 	ConditionCallable func() ConditionManager
 
 	// ConditionManager
-	// 条件管理器接口.
+	// 条件管理器.
 	ConditionManager interface {
 		// Validate
 		// 条件校验.

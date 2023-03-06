@@ -13,14 +13,14 @@ type (
 	Adapter string
 
 	// ConsumerCallable
-	// MQ中间件的消费者构造函数.
+	// 消费者构造/适配MQ中间件.
 	ConsumerCallable func(id, parallel int, name string, process ConsumerProcess) ConsumerManager
 
 	// ConsumerManager
-	// MQ中间件的消费者管理器.
+	// 消费者管理器/适配MQ中间件.
 	ConsumerManager interface {
 		// Processor
-		// 获取执行器.
+		// 类进程.
 		Processor() process.Processor
 	}
 
@@ -34,26 +34,30 @@ type (
 	ConsumerProcess func(task *Task, message *Message) (ignored bool, err error)
 
 	// ProducerCallable
-	// MQ中间件的生产者构造函数.
+	// 生产者构造/适配MQ中间件.
 	ProducerCallable func() ProducerManager
 
 	// ProducerManager
-	// MQ中间件的生产者管理器.
+	// 生产者管理器/适配MQ中间件.
 	ProducerManager interface {
 		// Processor
-		// 获取执行器.
+		// 类进程.
 		Processor() process.Processor
+
+		// Publish
+		// 发布消息.
+		Publish(v *Payload) (mid string, err error)
 	}
 
 	// RemotingCallable
-	// MQ中间件的服务商构造函数.
+	// 服务端构造/适配MQ中间件.
 	RemotingCallable func() RemotingManager
 
 	// RemotingManager
-	// MQ中间件的服务端管理器.
+	// 服务端管理器/适配MQ中间件.
 	RemotingManager interface {
 		// Processor
-		// 获取执行器.
+		// 类进程.
 		Processor() process.Processor
 	}
 )

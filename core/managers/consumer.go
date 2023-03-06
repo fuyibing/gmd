@@ -34,8 +34,7 @@ func (o *Consumer) DoConsume(_ *base.Task, _ *base.Message) (retry bool, err err
 
 func (o *Consumer) DoMemoryReload() {
 	var (
-		c   = log.NewTrace("consumer")
-		cs  = c.NewSpan("consumer.memory.reload")
+		cs  = log.NewSpan("consumer.memory.reload")
 		err error
 	)
 
@@ -49,7 +48,7 @@ func (o *Consumer) DoMemoryReload() {
 		cs.End()
 	}()
 
-	if err = base.Memory.Reload(cs.GetContext()); err != nil {
+	if err = base.Memory.Reload(cs.Context()); err != nil {
 		return
 	}
 
@@ -135,7 +134,11 @@ func (o *Consumer) OnCallSubprocessLoad(_ context.Context) (ignored bool) {
 }
 
 func (o *Consumer) OnPanic(ctx context.Context, v interface{}) {
-	// log.Panicfc(ctx, "processor {%s} fatal: %v", o.name, v)
+	if spa, exists := log.Span(ctx); exists {
+		spa.Logger().Fatal("<%s> %v", o.name, v)
+	} else {
+		log.Fatal("<%s> %v", o.name, v)
+	}
 }
 
 func (o *Consumer) init() *Consumer {

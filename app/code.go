@@ -18,7 +18,10 @@ package app
 const (
 	CodeInvalidPayloadFields    = 1001
 	CodeInvalidPayloadFormatter = 1002
-	CodeServiceReadError        = 2001
-	CodeServiceReadNotFound     = 2002
-	CodeServiceWriteError       = 2003
+
+	CodeRegistryNotFound = 103
+
+	CodeServiceReadError    = 2001
+	CodeServiceReadNotFound = 2002
+	CodeServiceWriteError   = 2003
 )

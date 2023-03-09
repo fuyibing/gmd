@@ -16,6 +16,11 @@
 package app
 
 const (
-	CodePanicOccurred  = 1
-	CodeLogicUndefined = 2
+	_ int = iota
+
+	CodePanicOccurred
+	CodeLogicUndefined
+	CodePayloadInvalid
+
+	CodeRegistryNotFound
 )

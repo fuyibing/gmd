@@ -16,24 +16,36 @@
 package topic
 
 import (
-	"github.com/fuyibing/gmd/v8/app/logics"
-	"github.com/fuyibing/gmd/v8/app/logics/topic"
+	"github.com/fuyibing/log/v5/tracers"
 	"github.com/kataras/iris/v12"
 )
 
-// Controller
-// 主题操作.
-//
-// @RoutePrefix(/topic)
-type Controller struct{}
+type (
+	// PostBatch
+	// 发布批量消息.
+	PostBatch struct {
+		request  *PostBatchRequest
+		response *PostBatchResponse
+	}
 
-// func (o *Controller) PostBatch(i iris.Context) interface{} {}
+	// PostBatchRequest
+	// 消息入参.
+	PostBatchRequest struct {
+	}
 
-// PostPublish
-// 发布消息.
-//
-// @Request(app/logics/topic.PostPublishRequest)
-// @Response(app/logics/topic.PostPublishResponse)
-func (o *Controller) PostPublish(i iris.Context) interface{} {
-	return logics.New(i, topic.NewPostPublish().Run)
+	// PostBatchResponse
+	// 发布结果.
+	PostBatchResponse struct {
+	}
+)
+
+func NewPostBatch() *PostBatch {
+	return &PostBatch{
+		request:  &PostBatchRequest{},
+		response: &PostBatchResponse{},
+	}
+}
+
+func (o *PostBatch) Run(span tracers.Span, i iris.Context) interface{} {
+	return "/topic/batch"
 }

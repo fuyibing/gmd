@@ -17,7 +17,7 @@ package managers
 
 import (
 	"fmt"
-	"github.com/fuyibing/gmd/v8/.bak/v230307/app"
+	"github.com/fuyibing/gmd/v8/app"
 	"github.com/fuyibing/gmd/v8/md/base"
 	"github.com/fuyibing/log/v5"
 	"sync/atomic"
@@ -188,14 +188,14 @@ func (o *consume) notify(task *base.Task, message *base.Message, releaser func(*
 		// 结果通知.
 		if message.GetError() != nil {
 			if task.IsNotificationFailed() {
-				tag = app.Config.GetConsumer().GetNotifyTagFailed()
+				tag = app.Config.GetProducer().GetNotifyTagFailed()
 			} else {
 				return
 			}
 		} else {
 			// 成功通知.
 			if task.IsNotificationSucceed() {
-				tag = app.Config.GetConsumer().GetNotifyTagSucceed()
+				tag = app.Config.GetProducer().GetNotifyTagSucceed()
 			} else {
 				return
 			}
@@ -210,7 +210,7 @@ func (o *consume) notify(task *base.Task, message *base.Message, releaser func(*
 		p := base.Pool.AcquirePayload().SetContext(message.GetContext())
 		p.GenHash()
 
-		p.TopicName = app.Config.GetConsumer().GetNotifyTopic()
+		p.TopicName = app.Config.GetProducer().GetNotifyTopic()
 		p.TopicTag = tag
 		p.FilterTag = tag
 		p.MessageBody = ntf.String()

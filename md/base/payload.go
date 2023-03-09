@@ -38,14 +38,13 @@ type (
 		messageId string
 
 		RegistryId int
+		Hash       string
+		Offset     int
 
-		Hash   string
-		Offset int
-
-		TopicName   string
-		TopicTag    string
 		FilterTag   string
 		MessageBody string
+		TopicName   string
+		TopicTag    string
 	}
 )
 

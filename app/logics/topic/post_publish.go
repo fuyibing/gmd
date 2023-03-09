@@ -59,6 +59,10 @@ func NewPostPublish() *PostPublish {
 	}
 }
 
+// +---------------------------------------------------------------------------+
+// + Logic runner                                                              |
+// +---------------------------------------------------------------------------+
+
 func (o *PostPublish) Run(span tracers.Span, i iris.Context) (res interface{}) {
 	var (
 		code     int
@@ -70,9 +74,11 @@ func (o *PostPublish) Run(span tracers.Span, i iris.Context) (res interface{}) {
 
 	// 发布结束.
 	defer func() {
-		span.Kv().Add("payload.created.tag", o.request.Tag).
-			Add("payload.created.topic", o.request.Topic)
+		span.Kv().
+			Add("payload.created.topic.tag", o.request.Tag).
+			Add("payload.created.topic.name", o.request.Topic)
 
+		// 覆盖结果.
 		if err != nil {
 			res = response.With.ErrorCode(err, code)
 		}
@@ -100,6 +106,8 @@ func (o *PostPublish) Run(span tracers.Span, i iris.Context) (res interface{}) {
 	payload = base.Pool.AcquirePayload().SetContext(span.Context())
 	payload.GenHash()
 
+	o.response.Hash = payload.Hash
+
 	// 基础字段.
 	payload.FilterTag = registry.FilterTag
 	payload.MessageBody = o.request.MessageBody
@@ -117,10 +125,13 @@ func (o *PostPublish) Run(span tracers.Span, i iris.Context) (res interface{}) {
 	}
 
 	// 完成发布.
-	o.response.Hash = payload.Hash
 	res = response.With.Data(o.response)
 	return
 }
+
+// +---------------------------------------------------------------------------+
+// + Request validate                                                          |
+// +---------------------------------------------------------------------------+
 
 func (o *PostPublishRequest) Validate() error {
 	if s, ok := o.Message.(string); ok {

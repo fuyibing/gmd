@@ -368,7 +368,8 @@ func (o *Consumer) pipeHandle(ext *rmqp.MessageExt) (retry bool) {
 		Add("message.received.message.time", msg.MessageTime).
 		Add("message.received.task.id", o.id).
 		Add("message.received.task.parallel", o.parallel)
-	span.Logger().Info("message received: topic-name=%s, topic-tag=%s, message-id=%s, message-delay-ms=%d",
+	span.Logger().Info("<%s> message received: topic-name=%s, topic-tag=%s, message-id=%s, message-delay-ms=%d",
+		o.name,
 		ext.Topic,
 		ext.GetTags(),
 		ext.MsgId,

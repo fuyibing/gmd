@@ -15,10 +15,6 @@
 
 package base
 
-import (
-	"context"
-)
-
 type (
 	// ResultConstructor
 	// 结果构造器.
@@ -33,6 +29,6 @@ type (
 
 		// Validate
 		// 校验结果.
-		Validate(ctx context.Context, task, source *Task, body []byte) (code int, err error)
+		Validate(task, source *Task, message *Message, body []byte) (code int, err error)
 	}
 )

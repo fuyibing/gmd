@@ -15,10 +15,6 @@
 
 package base
 
-import (
-	"context"
-)
-
 const (
 	DispatcherHeaderDequeueCount = "X-Gmd-Dequeue-Count"
 	DispatcherHeaderMessageId    = "X-Gmd-Message-Id"
@@ -38,7 +34,7 @@ type (
 	DispatcherExecutor interface {
 		// Dispatch
 		// 分发过程.
-		Dispatch(ctx context.Context, task, source *Task, message *Message) (body []byte, err error)
+		Dispatch(task, source *Task, message *Message) (body []byte, err error)
 
 		// Name
 		// 执行器名称.

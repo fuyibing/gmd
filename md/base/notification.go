@@ -34,20 +34,18 @@ type (
 // 解码通知消息.
 func (o *Notification) Decoder(message *Message) (*Task, error) {
 	// 解码消息.
-	if err := json.Unmarshal([]byte(message.MessageBody), o); err != nil {
-		err = fmt.Errorf("invalid notification message body")
+	if err := json.Unmarshal([]byte(message.MessageBody), o); err != nil || o.TaskId == 0 {
+		err = fmt.Errorf("illegal message format")
 		return nil, err
 	}
 
 	// 加载任务.
-	if o.TaskId > 0 {
-		if source, exists := Memory.GetTask(o.TaskId); exists {
-			return source, nil
-		}
+	if source, exists := Memory.GetTask(o.TaskId); exists {
+		return source, nil
 	}
 
-	return nil,
-		fmt.Errorf("notification source task not found: task-id=%d", o.TaskId)
+	// 无效任务.
+	return nil, fmt.Errorf("subscription task disabled or deleted")
 }
 
 func (o *Notification) Release() { Pool.ReleaseNotification(o) }

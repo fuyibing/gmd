@@ -15,10 +15,6 @@
 
 package base
 
-import (
-	"context"
-)
-
 type (
 	// ConditionConstructor
 	// 条件构造器.
@@ -33,6 +29,6 @@ type (
 
 		// Validate
 		// 校验条件.
-		Validate(ctx context.Context, task, source *Task, message *Message) (ignored bool, err error)
+		Validate(task *Task, message *Message) (ignored bool, err error)
 	}
 )

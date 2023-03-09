@@ -37,12 +37,12 @@ type (
 		err       error
 		messageId string
 
-		RegistryId int
-		Hash       string
-		Offset     int
+		Hash   string
+		Offset int
 
 		FilterTag   string
 		MessageBody string
+		RegistryId  int
 		TopicName   string
 		TopicTag    string
 	}

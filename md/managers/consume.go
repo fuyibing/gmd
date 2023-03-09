@@ -56,69 +56,54 @@ func (o *consume) Do(task *base.Task, message *base.Message) (retry bool, err er
 		ignored    bool
 		source     *base.Task
 		subscriber base.Subscriber
-		span       = log.NewSpanFromContext(message.GetContext(), "message.consume")
 	)
 
-	span.Kv().Add("consume.message.id", message.MessageId)
-	message.TaskId = task.Id
-
 	// 结束消费.
-	// 消息消费结束后发送结果通知/释放实例回池.
 	defer func() {
-		span.End()
 		atomic.AddInt32(&o.consuming, -1)
 
-		// 后续处理.
+		// 结果处理.
 		if retry = !ignored && err != nil && message.Dequeue < task.MaxRetry; retry {
-			o.release(message)
+			// 直接释放.
+			o.doRelease(message)
 		} else {
-			o.notify(task, message, o.release)
+			// 结果通知并释放.
+			o.doNotification(task, message)
 		}
 	}()
 
-	// 检查订阅.
-	if source, subscriber, message.DispatcherBody, err = o.check(task, message); err != nil {
-		span.Logger().Error("consume check error: %v", err)
+	// 校验出错.
+	//
+	// 1. 通用订阅 (handler_dispatcher_addr) 未定义.
+	// 2. 结果通知 (<failed_dispatcher_addr>, <succeed_dispatcher_addr>) 未定义.
+	// 3. 结果格式不合法.
+	if source, subscriber, err = o.checkTask(task, message); err != nil {
+		o.doIllegal(message, err)
 		return
 	}
 
 	// 条件校验.
-	if subscriber.HasCondition() {
-		ignored, err = subscriber.GetCondition().Validate(span.Context(), task, source, message)
-
-		// 条件错误.
-		if err != nil {
-			span.Logger().Error("condition error parse: %v", err)
-			return
-		}
-
-		// 忽略条件.
-		if ignored {
-			span.Logger().Error("condition parse ignored")
-			return
-		}
+	//
+	// 1. 规则不合法.
+	// 2. 规则不匹配.
+	if ignored, err = o.doCondition(subscriber, task, message); err != nil || ignored {
+		return
 	}
 
 	// 投递过程.
-	if subscriber.HasDispatcher() {
-		t := time.Now()
-		body, err = subscriber.GetDispatcher().Dispatch(span.Context(), task, source, message)
-		message.SetDuration(time.Now().Sub(t)).SetError(err).SetResponseBody(body)
+	t := time.Now()
+	body, err = o.doDispatch(subscriber, task, source, message)
 
-		// 投递出错.
-		if err != nil {
-			if body == nil {
-				message.SetResponseBody([]byte(err.Error()))
-			}
+	// 保存结果.
+	message.SetDuration(time.Now().Sub(t)).SetError(err).SetResponseBody(body)
 
-			span.Logger().Error("dispatch error: %v", err)
-			return
+	// 校验结果.
+	if err == nil {
+		_, err = o.doResult(subscriber, task, source, message, body)
+	} else {
+		if body == nil {
+			message.SetResponseBody([]byte(err.Error()))
 		}
-	}
-
-	// 结果校验.
-	if subscriber.HasResult() {
-		_, err = subscriber.GetResult().Validate(span.Context(), task, source, body)
 	}
 	return
 }
@@ -130,108 +115,176 @@ func (o *consume) Idle() bool {
 }
 
 // +---------------------------------------------------------------------------+
-// + Constructor and access methods                                            |
+// + Access methods                                                            |
 // +---------------------------------------------------------------------------+
 
-func (o *consume) check(task *base.Task, message *base.Message) (source *base.Task, subscriber base.Subscriber, dispatchBody string, err error) {
-	defer func() {
-		if err == nil && subscriber == nil {
-			err = fmt.Errorf("subscriber not configured")
-		}
-	}()
+// 检查任务.
+func (o *consume) checkTask(task *base.Task, message *base.Message) (source *base.Task, subscriber base.Subscriber, err error) {
+	message.TaskId = task.Id
 
 	// 失败通知.
+	// 消息投递失败时, 投递结果通知订阅方.
 	if task.IsNotificationFailed() {
 		v := base.Pool.AcquireNotification()
 		defer v.Release()
 
 		if source, err = v.Decoder(message); err == nil {
-			dispatchBody = v.MessageBody
-			subscriber = source.SubscriberFailed
+			message.DispatcherBody = v.MessageBody
+
+			if subscriber = source.SubscriberFailed; subscriber == nil {
+				err = fmt.Errorf("subscriber undefined for failed handler")
+			}
 		}
 		return
 	}
 
 	// 成功通知.
+	// 消息投递成功时, 投递结果通知订阅方.
 	if task.IsNotificationSucceed() {
 		v := base.Pool.AcquireNotification()
 		defer v.Release()
 
 		if source, err = v.Decoder(message); err == nil {
-			dispatchBody = v.MessageBody
-			subscriber = source.SubscriberSucceed
+			message.DispatcherBody = v.MessageBody
+
+			if subscriber = source.SubscriberSucceed; subscriber == nil {
+				err = fmt.Errorf("subscriber undefined for succeed handler")
+			}
 		}
 		return
 	}
 
 	// 通用订阅.
-	dispatchBody = message.MessageBody
-	subscriber = task.Subscriber
+	source = task
+	if subscriber = source.Subscriber; subscriber == nil {
+		message.DispatcherBody = message.MessageBody
+		err = fmt.Errorf("subscriber undefined for normal handler")
+	}
 	return
 }
 
-func (o *consume) init() *consume {
-	return o
+// 条件校验.
+func (o *consume) doCondition(subscriber base.Subscriber, task *base.Task, message *base.Message) (ignored bool, err error) {
+	if !subscriber.HasCondition() {
+		return
+	}
+	return subscriber.GetCondition().Validate(task, message)
 }
 
-// 结果通知.
-func (o *consume) notify(task *base.Task, message *base.Message, releaser func(*base.Message)) {
+// 投递过程.
+func (o *consume) doDispatch(subscriber base.Subscriber, task, source *base.Task, message *base.Message) (body []byte, err error) {
+	// 未定义投递规则.
+	if !subscriber.HasDispatcher() {
+		span := log.NewSpanFromContext(message.GetContext(), "message.dispatch.undefined")
+		defer span.End()
+
+		err = fmt.Errorf("undefined in subscriber")
+		span.Logger().Error("message dispatch: %v", err)
+		return
+	}
+
+	// 投递过程.
+	return subscriber.GetDispatcher().Dispatch(task, source, message)
+}
+
+// 无效任务.
+func (o *consume) doIllegal(message *base.Message, err error) {
+	span := log.NewSpanFromContext(message.GetContext(), "message.illegal")
+	span.Logger().Error("message illegal: %v", err)
+	span.End()
+}
+
+// 发送通知.
+func (o *consume) doNotification(task *base.Task, message *base.Message) {
 	atomic.AddInt32(&o.notifying, 1)
 	go func() {
 		var (
-			ntf *base.Notification
-			tag = ""
+			exists       bool
+			notification *base.Notification
+			payload      *base.Payload
+			registry     *base.Registry
+			span         = log.NewSpanFromContext(message.GetContext(), "message.notification")
+			topic        = app.Config.GetProducer().GetNotifyTopic()
+			tag          string
 		)
 
-		// 结束通知.
+		// 监听结束.
 		defer func() {
-			if ntf != nil {
-				ntf.Release()
+			// 释放通知.
+			if notification != nil {
+				notification.Release()
 			}
 
+			// 结束通知.
+			span.End()
 			atomic.AddInt32(&o.notifying, -1)
-			releaser(message)
+
+			// 释放消息.
+			message.Release()
 		}()
 
-		// 结果通知.
+		// 通知类型.
 		if message.GetError() != nil {
-			if task.IsNotificationFailed() {
+			// 失败通知.
+			if task.IsSubscriberFailed() {
 				tag = app.Config.GetProducer().GetNotifyTagFailed()
-			} else {
-				return
 			}
 		} else {
 			// 成功通知.
-			if task.IsNotificationSucceed() {
+			if task.IsSubscriberSucceed() {
 				tag = app.Config.GetProducer().GetNotifyTagSucceed()
-			} else {
-				return
 			}
 		}
+		if tag == "" {
+			span.Logger().Info("notification not enabled")
+			return
+		}
 
-		ntf = base.Pool.AcquireNotification()
-		ntf.MessageBody = message.GetResponseBody()
-		ntf.MessageId = message.MessageId
-		ntf.TaskId = task.Id
+		// 注册组合.
+		span.Kv().Add("message.notification.topic.tag", tag).
+			Add("message.notification.topic.name", topic)
+		if registry, exists = base.Memory.GetRegistryByNames(topic, tag); !exists {
+			span.Logger().Info("registry not found: topic-name=%s, topic-tag=%s", topic, tag)
+			return
+		}
 
-		// 消息结构.
-		p := base.Pool.AcquirePayload().SetContext(message.GetContext())
-		p.GenHash()
+		// 通知消息.
+		notification = base.Pool.AcquireNotification()
+		notification.MessageId = message.MessageId
+		notification.MessageBody = message.GetResponseBody()
+		notification.TaskId = task.Id
 
-		p.TopicName = app.Config.GetProducer().GetNotifyTopic()
-		p.TopicTag = tag
-		p.FilterTag = tag
-		p.MessageBody = ntf.String()
+		// 消息正文.
+		payload = base.Pool.AcquirePayload().SetContext(span.Context())
+		payload.GenHash()
+		payload.FilterTag = registry.FilterTag
+		payload.MessageBody = notification.String()
+		payload.RegistryId = registry.Id
+		payload.TopicName = registry.TopicName
+		payload.TopicTag = registry.TopicTag
 
-		// todo: 调用通知发布
+		// 即时发布.
+		if err := Boot.Producer().PublishSync(payload); err != nil {
+			span.Logger().Error("notification send error: %v", err)
+		}
 	}()
 }
 
-// 释放消息.
-func (o *consume) release(message *base.Message) {
+// 释放回池.
+func (o *consume) doRelease(message *base.Message) {
 	atomic.AddInt32(&o.releasing, 1)
 	go func() {
 		defer atomic.AddInt32(&o.releasing, -1)
 		message.Release()
 	}()
 }
+
+// 校验结果.
+func (o *consume) doResult(subscriber base.Subscriber, task, source *base.Task, message *base.Message, body []byte) (code int, err error) {
+	if subscriber.HasResult() {
+		code, err = subscriber.GetResult().Validate(task, source, message, body)
+	}
+	return
+}
+
+func (o *consume) init() *consume { return o }

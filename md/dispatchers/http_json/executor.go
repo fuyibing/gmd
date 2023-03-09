@@ -20,7 +20,6 @@
 package http_json
 
 import (
-	"context"
 	"fmt"
 	"github.com/fuyibing/gmd/v8/app"
 	"github.com/fuyibing/gmd/v8/md/base"
@@ -48,15 +47,19 @@ func New(addr, method string, timeout int) base.DispatcherExecutor {
 // + Interface methods                                                         |
 // +---------------------------------------------------------------------------+
 
-func (o *Executor) Dispatch(ctx context.Context, task, _ *base.Task, message *base.Message) (body []byte, err error) {
+func (o *Executor) Dispatch(_, source *base.Task, message *base.Message) (body []byte, err error) {
 	var (
-		span     = log.NewSpanFromContext(ctx, "dispatch.http")
+		span     = log.NewSpanFromContext(message.GetContext(), "message.dispatch.http.json")
 		request  = fasthttp.AcquireRequest()
 		response = fasthttp.AcquireResponse()
 	)
 
 	// 结束投递.
 	defer func() {
+		// 释放入池.
+		fasthttp.ReleaseRequest(request)
+		fasthttp.ReleaseResponse(response)
+
 		// 捕获异常.
 		if r := recover(); r != nil {
 			span.Logger().Fatal("dispatch fatal: %v", r)
@@ -66,15 +69,11 @@ func (o *Executor) Dispatch(ctx context.Context, task, _ *base.Task, message *ba
 			}
 		}
 
-		// 释放入池.
-		fasthttp.ReleaseRequest(request)
-		fasthttp.ReleaseResponse(response)
-
 		// 结束跨度.
 		if err != nil {
-			span.Logger().Error("dispatch error: %v", err)
+			span.Logger().Error("dispatch failure: %v", err)
 		} else {
-			span.Logger().Info("dispatch completed: %s", body)
+			span.Logger().Info("dispatch succeed: %s", body)
 		}
 
 		span.End()
@@ -107,8 +106,8 @@ func (o *Executor) Dispatch(ctx context.Context, task, _ *base.Task, message *ba
 	request.Header.Add(base.DispatcherHeaderMessageId, message.MessageId)
 	request.Header.Add(base.DispatcherHeaderMessageTime, fmt.Sprintf("%d", message.MessageTime))
 	request.Header.Add(base.DispatcherHeaderSoftware, app.Config.GetSoftware())
-	request.Header.Add(base.DispatcherHeaderTopicTag, task.TopicTag)
-	request.Header.Add(base.DispatcherHeaderTopicName, task.TopicName)
+	request.Header.Add(base.DispatcherHeaderTopicTag, source.TopicTag)
+	request.Header.Add(base.DispatcherHeaderTopicName, source.TopicName)
 
 	// 请求过程.
 	span.Logger().Info("dispatch on: %s %s %v", request.Header.Protocol(), o.method, o.addr)
@@ -117,17 +116,17 @@ func (o *Executor) Dispatch(ctx context.Context, task, _ *base.Task, message *ba
 	return
 }
 
-func (o *Executor) Name() string { return o.name }
+func (o *Executor) Name() string {
+	return o.name
+}
 
 // +---------------------------------------------------------------------------+
 // + Constructor and access methods                                            |
 // +---------------------------------------------------------------------------+
 
-func (o *Executor) send() {}
-
 func (o *Executor) init(timeout int) *Executor {
 	o.contentType = "application/json"
-	o.name = "dispatcher:http"
+	o.name = "dispatcher.http.json"
 
 	if timeout > 0 {
 		o.timeout = time.Duration(timeout) * time.Second

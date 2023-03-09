@@ -58,27 +58,36 @@ func (o *producer) Processor() process.Processor {
 	return o.processor
 }
 
-func (o *producer) Publish(payload *base.Payload) error {
-	span := log.NewSpanFromContext(payload.GetContext(), "payload.push.into.bucket")
+func (o *producer) Publish(payload *base.Payload) (err error) {
+	var (
+		span  = log.NewSpanFromContext(payload.GetContext(), "payload.push.into.bucket")
+		total int
+	)
+
 	span.Kv().
 		Add("payload.push.hash", payload.Hash).
 		Add("payload.push.offset", payload.Offset)
+
 	defer span.End()
 
 	// 消息入桶.
-	if _, err := o.bucket.Add(payload); err != nil {
+	if total, err = o.bucket.Add(payload); err != nil {
 		span.Logger().Error("payload push into bucket: %v", err)
 		o.release(payload)
 		return err
 	}
 
 	// 异步取出.
+	span.Logger().Info("payload push into bucket: total=%d", total)
 	go o.pop()
-	return nil
+	return
 }
 
-func (o *producer) PublishSync(payload *base.Payload) error {
-	return o.send(payload)
+func (o *producer) PublishSync(payload *base.Payload) (err error) {
+	if err = o.send(payload); err != nil {
+		o.release(payload)
+	}
+	return
 }
 
 // +---------------------------------------------------------------------------+
@@ -206,16 +215,14 @@ func (o *producer) send(payload *base.Payload) (err error) {
 	var (
 		messageId string
 		span      = log.NewSpanFromContext(payload.GetContext(), "payload.publish")
-		t         = time.Now()
 	)
+
+	defer span.End()
 
 	span.Kv().
 		Add("payload.publish.adapter", o.executor.Processor().Name()).
 		Add("payload.publish.hash", payload.Hash).
 		Add("payload.publish.offset", payload.Offset)
-
-	span.Logger().
-		Info("payload publish: adapter=%s, hash=%s, offset=%d", o.executor.Processor().Name(), payload.Hash, payload.Offset)
 
 	// 结束发布.
 	defer func() {
@@ -231,15 +238,13 @@ func (o *producer) send(payload *base.Payload) (err error) {
 
 		// 记录结果.
 		if err != nil {
-			span.Logger().Error("payload publish: error=%v", err)
+			span.Logger().Error("payload publish error: %v", err)
 		} else {
 			span.Logger().Info("payload publish: message-id=%s", messageId)
 		}
-		span.End()
 
 		// 释放消息.
-		d := time.Now().Sub(t)
-		payload.SetDuration(d).SetError(err).SetMessageId(messageId)
+		payload.SetDuration(time.Now().Sub(span.StartTime())).SetError(err).SetMessageId(messageId)
 		o.release(payload)
 	}()
 

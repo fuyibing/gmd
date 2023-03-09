@@ -41,7 +41,6 @@
 package json_errno
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/fuyibing/gmd/v8/md/base"
@@ -88,11 +87,11 @@ func (o *Executor) Name() string {
 
 // Validate
 // 校验结果.
-func (o *Executor) Validate(ctx context.Context, _, _ *base.Task, body []byte) (code int, err error) {
+func (o *Executor) Validate(_, _ *base.Task, message *base.Message, body []byte) (code int, err error) {
 	var (
 		errno string
 		ptr   = &result{}
-		span  = log.NewSpanFromContext(ctx, "result.json.errno")
+		span  = log.NewSpanFromContext(message.GetContext(), "message.result.json.errno")
 	)
 
 	// 完成校验.
@@ -125,13 +124,13 @@ func (o *Executor) Validate(ctx context.Context, _, _ *base.Task, body []byte) (
 
 	// 转成JSON.
 	if err = json.Unmarshal(body, ptr); err != nil {
-		err = fmt.Errorf("json format: %v", err)
+		err = fmt.Errorf("illegal result format: %v", err)
 		return
 	}
 
 	// 错误编码.
 	if errno = fmt.Sprintf("%v", ptr.Errno); errno == "" {
-		err = fmt.Errorf("empty code")
+		err = fmt.Errorf("result code can not be blank")
 		return
 	}
 
@@ -144,7 +143,7 @@ func (o *Executor) Validate(ctx context.Context, _, _ *base.Task, body []byte) (
 	if errno != ErrnoZero {
 		for _, c := range o.ignoreCodes {
 			if c == errno {
-				span.Logger().Info("result ignored: code=%s", c)
+				span.Logger().Info("result code ignored: code=%s", c)
 				return
 			}
 		}
@@ -160,7 +159,7 @@ func (o *Executor) Validate(ctx context.Context, _, _ *base.Task, body []byte) (
 // +---------------------------------------------------------------------------+
 
 func (o *Executor) init(ic string) *Executor {
-	o.name = "result:http"
+	o.name = "result.json.errno"
 
 	// 计算忽略码.
 	for _, s := range strings.Split(ic, ",") {

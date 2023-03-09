@@ -16,8 +16,8 @@
 package el_condition
 
 import (
-	"context"
 	"github.com/fuyibing/gmd/v8/md/base"
+	"github.com/fuyibing/log/v5"
 )
 
 type Executor struct {
@@ -37,7 +37,16 @@ func New(filter string) base.ConditionExecutor {
 
 func (o *Executor) Name() string { return o.name }
 
-func (o *Executor) Validate(ctx context.Context, task, source *base.Task, message *base.Message) (ignored bool, err error) {
+func (o *Executor) Validate(_ *base.Task, message *base.Message) (ignored bool, err error) {
+	var (
+		span = log.NewSpanFromContext(message.GetContext(), "message.condition.validate")
+	)
+
+	span.Kv().Add("message.condition.filter", o.filter)
+
+	defer span.End()
+
+	span.Logger().Info("condition parse error")
 	return
 }
 

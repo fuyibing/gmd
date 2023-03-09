@@ -344,7 +344,7 @@ func (o *Consumer) pipeHandle(ext *rmqp.MessageExt) (retry bool) {
 	defer span.End()
 
 	// 基础字段.
-	msg.Dequeue = int(ext.ReconsumeTimes)
+	msg.Dequeue = int(ext.ReconsumeTimes) + 1
 	msg.MessageBody = string(ext.Body)
 	msg.MessageId = ext.MsgId
 	msg.MessageTime = ext.BornTimestamp
@@ -364,16 +364,14 @@ func (o *Consumer) pipeHandle(ext *rmqp.MessageExt) (retry bool) {
 
 	// 投递过程.
 	span.Kv().
+		Add("message.received.adapter", o.name).
 		Add("message.received.message.id", msg.MessageId).
 		Add("message.received.message.time", msg.MessageTime).
 		Add("message.received.task.id", o.id).
 		Add("message.received.task.parallel", o.parallel)
-	span.Logger().Info("<%s> message received: topic-name=%s, topic-tag=%s, message-id=%s, message-delay-ms=%d",
-		o.name,
-		ext.Topic,
-		ext.GetTags(),
-		ext.MsgId,
-		span.StartTime().Sub(time.UnixMilli(msg.MessageTime)).Milliseconds())
+	span.Logger().Info("message received: topic-name=%s, topic-tag=%s, message-id=%s, message-delay-ms=%d",
+		ext.Topic, ext.GetTags(),
+		ext.MsgId, span.StartTime().Sub(time.UnixMilli(msg.MessageTime)).Milliseconds())
 	retry, _ = o.handler(o.task, msg)
 	return
 }

@@ -71,6 +71,7 @@ func (o *Producer) Publish(payload *base.Payload) (messageId string, err error) 
 		Body:  []byte(payload.MessageBody),
 	}
 
+	// 绑定标签.
 	if payload.TopicTag != "" {
 		msg.WithTag(payload.TopicTag)
 	}

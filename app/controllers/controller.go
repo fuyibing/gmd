@@ -11,34 +11,31 @@
 // limitations under the License.
 //
 // author: wsfuyibing <websearch@163.com>
-// date: 2023-03-07
+// date: 2023-03-09
 
-package base
+package controllers
 
 import (
-	"fmt"
-	"github.com/fuyibing/gmd/v8/app/models"
-	"strings"
+	"github.com/fuyibing/gmd/v8/app/logics"
+	"github.com/fuyibing/gmd/v8/app/logics/index"
+	"github.com/kataras/iris/v12"
 )
 
-type (
-	// Registry
-	// 注册关系.
-	Registry struct {
-		Id        int
-		TopicName string
-		TopicTag  string
-		FilterTag string
-	}
-)
+// Controller
+// 默认.
+//
+// @RoutePrefix(/)
+type Controller struct {
+}
 
-func (o *Registry) init(m *models.Registry) *Registry {
-	o.Id = m.Id
-	o.TopicName = strings.ToUpper(m.TopicName)
-	o.TopicTag = strings.ToUpper(m.TopicTag)
+// Get
+// 默认页.
+func (o *Controller) Get(i iris.Context) interface{} {
+	return logics.New(i, index.NewGetHome().Run)
+}
 
-	if o.FilterTag = strings.ToUpper(m.FilterTag); o.FilterTag == "" {
-		o.FilterTag = fmt.Sprintf("T%d", m.Id)
-	}
-	return o
+// GetPing
+// 健康检查.
+func (o *Controller) GetPing(i iris.Context) interface{} {
+	return logics.New(i, index.NewGetPing().Run)
 }

@@ -82,8 +82,6 @@ func (o *Producer) Publish(payload *base.Payload) (messageId string, err error) 
 // + Event methods                                                             |
 // +---------------------------------------------------------------------------+
 
-// onClientBuild
-// 创建/RocketmqClient.
 func (o *Producer) onClientBuild(_ context.Context) (ignored bool) {
 	var (
 		err  error
@@ -125,8 +123,6 @@ func (o *Producer) onClientBuild(_ context.Context) (ignored bool) {
 	return
 }
 
-// onClientShutdown
-// 关闭/RocketmqClient.
 func (o *Producer) onClientShutdown(ctx context.Context) (ignored bool) {
 	// 任务完成.
 	// 应发布的消息全部处理完成后, 关闭连接.
@@ -144,8 +140,6 @@ func (o *Producer) onClientShutdown(ctx context.Context) (ignored bool) {
 	return o.onClientShutdown(ctx)
 }
 
-// onListen
-// 监听/Channel.
 func (o *Producer) onListen(ctx context.Context) (ignored bool) {
 	log.Info("<%s> channel listening", o.name)
 	defer log.Info("<%s> channel closed", o.name)
@@ -158,8 +152,6 @@ func (o *Producer) onListen(ctx context.Context) (ignored bool) {
 	}
 }
 
-// onPanic
-// 异常/Event.
 func (o *Producer) onPanic(_ context.Context, v interface{}) {
 	log.Fatal("<%s> %v", o.name, v)
 }

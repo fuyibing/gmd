@@ -16,29 +16,19 @@
 package base
 
 import (
-	"fmt"
-	"github.com/fuyibing/gmd/v8/app/models"
-	"strings"
+	"github.com/fuyibing/util/v8/process"
 )
 
 type (
-	// Registry
-	// 注册关系.
-	Registry struct {
-		Id        int
-		TopicName string
-		TopicTag  string
-		FilterTag string
+	// RemoterConstructor
+	// 服务端构造器.
+	RemoterConstructor func() RemoterExecutor
+
+	// RemoterExecutor
+	// 服务端执行器.
+	RemoterExecutor interface {
+		// Processor
+		// 类进程.
+		Processor() process.Processor
 	}
 )
-
-func (o *Registry) init(m *models.Registry) *Registry {
-	o.Id = m.Id
-	o.TopicName = strings.ToUpper(m.TopicName)
-	o.TopicTag = strings.ToUpper(m.TopicTag)
-
-	if o.FilterTag = strings.ToUpper(m.FilterTag); o.FilterTag == "" {
-		o.FilterTag = fmt.Sprintf("T%d", m.Id)
-	}
-	return o
-}

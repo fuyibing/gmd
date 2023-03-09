@@ -16,16 +16,65 @@
 package md
 
 import (
+	"github.com/fuyibing/gmd/v8/app"
+	"github.com/fuyibing/gmd/v8/md/base"
 	"github.com/fuyibing/gmd/v8/md/managers"
 	"sync"
 )
 
 var (
+	// Container
+	// 容器实例.
+	Container base.ContainerOperation
+
+	// Manager
+	// 管理器实例.
 	Manager managers.BootManager
 )
 
 func init() {
 	new(sync.Once).Do(func() {
 		Manager = managers.Boot
+		Container = base.Container
+
+		// +-------------------------------------------------------------------+
+		// + Adapter for: consumer & producer & remoter                        |
+		// +-------------------------------------------------------------------+
+
+		adapter := app.Config.GetAdapter()
+
+		// 1. 消费者.
+		if v := builtinConsumer(adapter).New(); v != nil {
+			Container.RegisterConsumer(v)
+		}
+
+		// 2. 生产者.
+		if v := builtinProducer(adapter).New(); v != nil {
+			Container.RegisterProducer(v)
+		}
+
+		// 3. 服务端.
+		if v := builtinRemoter(adapter).New(); v != nil {
+			Container.RegisterRemoter(v)
+		}
+
+		// +-------------------------------------------------------------------+
+		// + Dependency: condition & dispatcher & result                        |
+		// +-------------------------------------------------------------------+
+
+		// 1. 条件校验.
+		for k, v := range builtinConditions {
+			Container.RegisterCondition(k, v)
+		}
+
+		// 2. 投递消息.
+		for k, v := range builtinDispatchers {
+			Container.RegisterDispatcher(k, v)
+		}
+
+		// 3. 结果校验.
+		for k, v := range builtinResults {
+			Container.RegisterResult(k, v)
+		}
 	})
 }

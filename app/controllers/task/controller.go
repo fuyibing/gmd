@@ -11,34 +11,12 @@
 // limitations under the License.
 //
 // author: wsfuyibing <websearch@163.com>
-// date: 2023-03-07
+// date: 2023-03-09
 
-package base
+package task
 
-import (
-	"fmt"
-	"github.com/fuyibing/gmd/v8/app/models"
-	"strings"
-)
-
-type (
-	// Registry
-	// 注册关系.
-	Registry struct {
-		Id        int
-		TopicName string
-		TopicTag  string
-		FilterTag string
-	}
-)
-
-func (o *Registry) init(m *models.Registry) *Registry {
-	o.Id = m.Id
-	o.TopicName = strings.ToUpper(m.TopicName)
-	o.TopicTag = strings.ToUpper(m.TopicTag)
-
-	if o.FilterTag = strings.ToUpper(m.FilterTag); o.FilterTag == "" {
-		o.FilterTag = fmt.Sprintf("T%d", m.Id)
-	}
-	return o
-}
+// Controller
+// 订阅任务.
+//
+// @RoutePrefix(/task)
+type Controller struct{}

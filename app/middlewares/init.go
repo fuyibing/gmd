@@ -11,34 +11,23 @@
 // limitations under the License.
 //
 // author: wsfuyibing <websearch@163.com>
-// date: 2023-03-07
+// date: 2023-03-09
 
-package base
+package middlewares
 
 import (
-	"fmt"
-	"github.com/fuyibing/gmd/v8/app/models"
-	"strings"
+	"github.com/kataras/iris/v12/context"
+	"sync"
 )
 
-type (
-	// Registry
-	// 注册关系.
-	Registry struct {
-		Id        int
-		TopicName string
-		TopicTag  string
-		FilterTag string
-	}
+var (
+	Registry []context.Handler
 )
 
-func (o *Registry) init(m *models.Registry) *Registry {
-	o.Id = m.Id
-	o.TopicName = strings.ToUpper(m.TopicName)
-	o.TopicTag = strings.ToUpper(m.TopicTag)
-
-	if o.FilterTag = strings.ToUpper(m.FilterTag); o.FilterTag == "" {
-		o.FilterTag = fmt.Sprintf("T%d", m.Id)
-	}
-	return o
+func init() {
+	new(sync.Once).Do(func() {
+		Registry = []context.Handler{
+			Panic,
+		}
+	})
 }

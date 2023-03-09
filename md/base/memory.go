@@ -107,7 +107,10 @@ func (o *memory) GetTasks() (task map[int]*Task) {
 
 func (o *memory) Reload(ctx context.Context) (err error) {
 	sess := db.Connector.GetSlaveWithContext(ctx)
-	for _, call := range []func(*xorm.Session) error{o.loadRegistry, o.loadTask} {
+	for _, call := range []func(*xorm.Session) error{
+		o.loadRegistry,
+		o.loadTask,
+	} {
 		if err = call(sess); err != nil {
 			return
 		}

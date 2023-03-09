@@ -11,34 +11,28 @@
 // limitations under the License.
 //
 // author: wsfuyibing <websearch@163.com>
-// date: 2023-03-07
+// date: 2023-03-09
 
-package base
+package controllers
 
 import (
-	"fmt"
-	"github.com/fuyibing/gmd/v8/app/models"
-	"strings"
+	"github.com/fuyibing/gmd/v8/app/controllers/task"
+	"github.com/fuyibing/gmd/v8/app/controllers/topic"
+	"sync"
 )
 
-type (
+var (
 	// Registry
 	// 注册关系.
-	Registry struct {
-		Id        int
-		TopicName string
-		TopicTag  string
-		FilterTag string
-	}
+	Registry map[string]interface{}
 )
 
-func (o *Registry) init(m *models.Registry) *Registry {
-	o.Id = m.Id
-	o.TopicName = strings.ToUpper(m.TopicName)
-	o.TopicTag = strings.ToUpper(m.TopicTag)
-
-	if o.FilterTag = strings.ToUpper(m.FilterTag); o.FilterTag == "" {
-		o.FilterTag = fmt.Sprintf("T%d", m.Id)
-	}
-	return o
+func init() {
+	new(sync.Once).Do(func() {
+		Registry = map[string]interface{}{
+			"/":      &Controller{},
+			"/task":  &task.Controller{},
+			"/topic": &topic.Controller{},
+		}
+	})
 }

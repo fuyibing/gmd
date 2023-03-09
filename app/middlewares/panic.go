@@ -11,34 +11,29 @@
 // limitations under the License.
 //
 // author: wsfuyibing <websearch@163.com>
-// date: 2023-03-07
+// date: 2023-02-27
 
-package base
+package middlewares
 
 import (
-	"fmt"
-	"github.com/fuyibing/gmd/v8/app/models"
-	"strings"
+	"github.com/kataras/iris/v12"
+	"net/http"
 )
 
-type (
-	// Registry
-	// 注册关系.
-	Registry struct {
-		Id        int
-		TopicName string
-		TopicTag  string
-		FilterTag string
-	}
-)
+// Panic
+// 捕获异常.
+func Panic(i iris.Context) {
+	defer func() {
+		v := recover()
 
-func (o *Registry) init(m *models.Registry) *Registry {
-	o.Id = m.Id
-	o.TopicName = strings.ToUpper(m.TopicName)
-	o.TopicTag = strings.ToUpper(m.TopicTag)
+		// 取消处理.
+		if v == nil || i.IsStopped() {
+			return
+		}
 
-	if o.FilterTag = strings.ToUpper(m.FilterTag); o.FilterTag == "" {
-		o.FilterTag = fmt.Sprintf("T%d", m.Id)
-	}
-	return o
+		// 发送错误.
+		sendError(i, http.StatusInternalServerError, v)
+	}()
+
+	i.Next()
 }

@@ -33,6 +33,8 @@ type (
 	// BootManager
 	// 根管理器接口.
 	BootManager interface {
+		Processor() process.Processor
+
 		Consumer() ConsumerManager
 		Producer() ProducerManager
 		Remoter() RemoterManager
@@ -56,6 +58,8 @@ type (
 		remoter   RemoterManager
 	}
 )
+
+func (o *boot) Processor() process.Processor { return o.processor }
 
 func (o *boot) Consumer() ConsumerManager { return o.consumer }
 func (o *boot) Producer() ProducerManager { return o.producer }
@@ -112,8 +116,8 @@ func (o *boot) init() *boot {
 		Add(
 			o.consumer.Processor(),
 			o.producer.Processor(),
-			// o.retry.Processor(),
-			// o.remoter.Processor(),
+			o.retry.Processor(),
+			o.remoter.Processor(),
 		).
 		After(o.onAfter).
 		Before(o.onBefore).

@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"gopkg.in/yaml.v3"
 	"os"
+	"time"
 )
 
 var (
@@ -32,12 +33,17 @@ const (
 )
 
 type (
+	// Configuration
+	// 全局配置.
 	Configuration interface {
+		GetHost() string
 		GetName() string
 		GetPort() int
 		GetSoftware() string
+		GetStartTime() time.Time
 		GetVersion() string
 
+		GetAdapter() string
 		ConfigurationAdapterRocketmq
 
 		ConfigurationConsumer
@@ -46,23 +52,40 @@ type (
 
 	configuration struct {
 		Name    string `yaml:"-" json:"name"`
+		Host    string `yaml:"host" json:"host"`
 		Port    int    `yaml:"port" json:"port"`
 		Version string `yaml:"-" json:"version"`
 
-		Adapter         string                 `yaml:"adapter" json:"adapter"`
-		AdapterRocketmq *rocketmqConfiguration `yaml:"adapter-rocketmq" json:"adapter_rocketmq"`
+		// +-------------------------------------------------------------------+
+		// + Advanced configurations                                           |
+		// +-------------------------------------------------------------------+
 
 		Consumer *consumerConfiguration `yaml:"consumer" json:"consumer"`
 		Producer *producerConfiguration `yaml:"producer" json:"producer"`
 
-		software string
+		// +-------------------------------------------------------------------+
+		// + Adapter (AliyunMNS, Rocketmq, RabbitMQ)                           |
+		// +-------------------------------------------------------------------+
+
+		Adapter         string                 `yaml:"adapter" json:"adapter"`
+		AdapterRocketmq *rocketmqConfiguration `yaml:"adapter-rocketmq" json:"adapter_rocketmq"`
+
+		// +-------------------------------------------------------------------+
+		// + Internal                                                          |
+		// +-------------------------------------------------------------------+
+
+		software  string
+		startTime time.Time
 	}
 )
 
-func (o *configuration) GetName() string     { return o.Name }
-func (o *configuration) GetPort() int        { return o.Port }
-func (o *configuration) GetSoftware() string { return o.software }
-func (o *configuration) GetVersion() string  { return o.Version }
+func (o *configuration) GetAdapter() string      { return o.Adapter }
+func (o *configuration) GetHost() string         { return o.Host }
+func (o *configuration) GetName() string         { return o.Name }
+func (o *configuration) GetPort() int            { return o.Port }
+func (o *configuration) GetSoftware() string     { return o.software }
+func (o *configuration) GetStartTime() time.Time { return o.startTime }
+func (o *configuration) GetVersion() string      { return o.Version }
 
 // +---------------------------------------------------------------------------+
 // + Constructor and access methods                                            |
@@ -92,6 +115,7 @@ func (o *configuration) initDefaults() {
 	o.Version = DefaultConfigurationVersion
 
 	o.software = fmt.Sprintf("%v/%v", o.Name, o.Version)
+	o.startTime = time.Now()
 }
 
 func (o *configuration) initConsumer() {

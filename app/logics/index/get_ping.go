@@ -11,34 +11,36 @@
 // limitations under the License.
 //
 // author: wsfuyibing <websearch@163.com>
-// date: 2023-03-07
+// date: 2023-03-09
 
-package base
+package index
 
 import (
-	"fmt"
-	"github.com/fuyibing/gmd/v8/app/models"
-	"strings"
+	"github.com/fuyibing/log/v5/tracers"
+	"github.com/fuyibing/util/v8/web/response"
+	"github.com/kataras/iris/v12"
+	"runtime"
 )
 
 type (
-	// Registry
-	// 注册关系.
-	Registry struct {
-		Id        int
-		TopicName string
-		TopicTag  string
-		FilterTag string
+	GetPing struct {
+		response *GetPingResponse
+	}
+
+	GetPingResponse struct {
+		Goroutines int `json:"goroutines" label:"协程数"`
 	}
 )
 
-func (o *Registry) init(m *models.Registry) *Registry {
-	o.Id = m.Id
-	o.TopicName = strings.ToUpper(m.TopicName)
-	o.TopicTag = strings.ToUpper(m.TopicTag)
-
-	if o.FilterTag = strings.ToUpper(m.FilterTag); o.FilterTag == "" {
-		o.FilterTag = fmt.Sprintf("T%d", m.Id)
+func NewGetPing() *GetPing {
+	return &GetPing{
+		response: &GetPingResponse{},
 	}
-	return o
+}
+
+func (o *GetPing) Run(span tracers.Span, i iris.Context) interface{} {
+
+	o.response.Goroutines = runtime.NumGoroutine()
+
+	return response.With.Data(o.response)
 }

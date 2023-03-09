@@ -37,6 +37,10 @@ type (
 		// 生产者构造器.
 		GetProducer() (constructor ProducerConstructor)
 
+		// GetRemoter
+		// 服务端构造器.
+		GetRemoter() (constructor RemoterConstructor)
+
 		// GetCondition
 		// 条件构造器.
 		GetCondition(key string) (constructor ConditionConstructor, exists bool)
@@ -57,6 +61,10 @@ type (
 		// 注册生产者构造器.
 		RegisterProducer(constructor ProducerConstructor)
 
+		// RegisterRemoter
+		// 注册服务端构造器.
+		RegisterRemoter(v RemoterConstructor)
+
 		// RegisterCondition
 		// 注册条件构造器.
 		RegisterCondition(key string, constructor ConditionConstructor)
@@ -75,6 +83,7 @@ type (
 
 		cc ConsumerConstructor
 		pc ProducerConstructor
+		rc RemoterConstructor
 
 		cs map[string]ConditionConstructor
 		ds map[string]DispatcherConstructor
@@ -96,6 +105,12 @@ func (o *container) GetProducer() ProducerConstructor {
 	o.RLock()
 	defer o.RUnlock()
 	return o.pc
+}
+
+func (o *container) GetRemoter() RemoterConstructor {
+	o.RLock()
+	defer o.RUnlock()
+	return o.rc
 }
 
 func (o *container) GetCondition(k string) (v ConditionConstructor, exists bool) {
@@ -129,6 +144,12 @@ func (o *container) RegisterProducer(v ProducerConstructor) {
 	o.Lock()
 	defer o.Unlock()
 	o.pc = v
+}
+
+func (o *container) RegisterRemoter(v RemoterConstructor) {
+	o.Lock()
+	defer o.Unlock()
+	o.rc = v
 }
 
 func (o *container) RegisterCondition(k string, v ConditionConstructor) {

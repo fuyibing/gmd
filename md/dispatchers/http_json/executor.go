@@ -13,6 +13,10 @@
 // author: wsfuyibing <websearch@163.com>
 // date: 2023-03-07
 
+// Package http_json
+// 以 Raw 格式发起 HTTP 请求.
+//
+//   - Content-Type: application/json
 package http_json
 
 import (

@@ -16,7 +16,7 @@
 package app
 
 const (
-	defaultConsumerReloadFrequency = 10
+	defaultConsumerReloadFrequency = 180
 )
 
 type (

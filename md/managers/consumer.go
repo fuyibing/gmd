@@ -34,6 +34,10 @@ type (
 		// Processor
 		// 类进程.
 		Processor() process.Processor
+
+		// Reload
+		// 重新加载.
+		Reload()
 	}
 
 	consumer struct {
@@ -47,6 +51,7 @@ type (
 
 		name      string
 		processor process.Processor
+		re        chan bool
 	}
 )
 
@@ -54,7 +59,15 @@ type (
 // + Interface methods                                                         |
 // +---------------------------------------------------------------------------+
 
-func (o *consumer) Processor() process.Processor { return o.processor }
+func (o *consumer) Processor() process.Processor {
+	return o.processor
+}
+
+func (o *consumer) Reload() {
+	if o.re != nil && o.processor.Healthy() {
+		o.re <- true
+	}
+}
 
 // +---------------------------------------------------------------------------+
 // + Event methods                                                             |
@@ -76,7 +89,7 @@ func (o *consumer) onAdapterCheck(_ context.Context) (ignored bool) {
 	}
 
 	log.Error("<%s> adapter not injected into container", o.name)
-	return
+	return true
 }
 
 func (o *consumer) onAdapterFlush(ctx context.Context) (ignored bool) {
@@ -88,8 +101,12 @@ func (o *consumer) onListen(ctx context.Context) (ignored bool) {
 	rf := time.Duration(app.Config.GetConsumer().GetReloadFrequency()) * time.Second
 	ti := time.NewTicker(rf)
 
+	o.re = make(chan bool)
+
 	for {
 		select {
+		case <-o.re:
+			go o.loader()
 		case <-ti.C:
 			go o.loader()
 		case <-ctx.Done():

@@ -13,7 +13,7 @@
 // author: wsfuyibing <websearch@163.com>
 // date: 2023-03-08
 
-package managers
+package rocketmq
 
 import (
 	"context"
@@ -23,44 +23,40 @@ import (
 )
 
 type (
-	// RemoterManager
-	// 服务端管理器.
-	RemoterManager interface {
-		// Processor
-		// 类进程.
-		Processor() process.Processor
-	}
-
-	remoter struct {
-		executor  base.RemoterExecutor
-		name      string
-		processor process.Processor
+	// Remoter
+	// 服务端.
+	Remoter struct {
+		name       string
+		processor  process.Processor
+		processing int32
 	}
 )
 
-func (o *remoter) Processor() process.Processor { return o.processor }
+func NewRemoter() (remoter base.RemoterExecutor) {
+	return (&Remoter{}).init()
+}
+
+// +---------------------------------------------------------------------------+
+// + Interface methods                                                         |
+// +---------------------------------------------------------------------------+
+
+func (o *Remoter) Processor() process.Processor {
+	return o.processor
+}
 
 // +---------------------------------------------------------------------------+
 // + Event methods                                                             |
 // +---------------------------------------------------------------------------+
 
-func (o *remoter) onAfter(_ context.Context) (ignored bool) {
+func (o *Remoter) onAfter(_ context.Context) (ignored bool) {
 	return
 }
 
-func (o *remoter) onBefore(_ context.Context) (ignored bool) {
-	if caller := base.Container.GetRemoter(); caller != nil {
-		if executor := caller(); executor != nil {
-			o.executor = executor
-			return
-		}
-	}
-
-	log.Error("<%s> adapter not injected into container", o.name)
-	return true
+func (o *Remoter) onBefore(_ context.Context) (ignored bool) {
+	return
 }
 
-func (o *remoter) onCall(ctx context.Context) (ignored bool) {
+func (o *Remoter) onListen(ctx context.Context) (ignored bool) {
 	for {
 		select {
 		case <-ctx.Done():
@@ -69,7 +65,7 @@ func (o *remoter) onCall(ctx context.Context) (ignored bool) {
 	}
 }
 
-func (o *remoter) onPanic(_ context.Context, v interface{}) {
+func (o *Remoter) onPanic(_ context.Context, v interface{}) {
 	log.Fatal("<%s> %v", o.name, v)
 }
 
@@ -77,13 +73,12 @@ func (o *remoter) onPanic(_ context.Context, v interface{}) {
 // + Constructor and access methods                                            |
 // +---------------------------------------------------------------------------+
 
-func (o *remoter) init() *remoter {
-	o.name = "remoter.manager"
+func (o *Remoter) init() *Remoter {
+	o.name = "rocketmq.remoter"
 	o.processor = process.New(o.name).
 		After(o.onAfter).
 		Before(o.onBefore).
-		Callback(o.onCall).
+		Callback(o.onListen).
 		Panic(o.onPanic)
-
 	return o
 }

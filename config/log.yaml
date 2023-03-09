@@ -16,6 +16,9 @@ tracer-topic: "gmd-v8"
 jaeger-tracer:
   content-type: "application/x-thrift"
   endpoint: "http://localhost:14268/api/traces"
+zipkin-tracer:
+  content-type: "application/json"
+  endpoint: "http://localhost:19411/api/v2/spans"
 file-tracer:
   path: "./logs"
   folder: "2006-01"

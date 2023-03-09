@@ -29,6 +29,15 @@ type Controller struct{}
 
 // func (o *Controller) PostBatch(i iris.Context) interface{} {}
 
+// PostBatch
+// 批量发布.
+//
+// @Request(app/logics/topic.PostBatchRequest)
+// @Response(app/logics/topic.PostBatchResponse)
+func (o *Controller) PostBatch(i iris.Context) interface{} {
+	return logics.New(i, topic.NewPostBatch().Run)
+}
+
 // PostPublish
 // 发布消息.
 //

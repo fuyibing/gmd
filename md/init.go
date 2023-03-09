@@ -11,16 +11,21 @@
 // limitations under the License.
 //
 // author: wsfuyibing <websearch@163.com>
-// date: 2023-03-08
+// date: 2023-03-07
 
-package app
+package md
 
 import (
+	"github.com/fuyibing/gmd/v8/md/managers"
 	"sync"
+)
+
+var (
+	Manager managers.BootManager
 )
 
 func init() {
 	new(sync.Once).Do(func() {
-		Config = (&configuration{}).init()
+		Manager = managers.Boot
 	})
 }

@@ -1,10 +1,21 @@
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
 // author: wsfuyibing <websearch@163.com>
-// date: 2023-01-17
+// date: 2023-03-07
 
 package services
 
 import (
-	"fmt"
 	"github.com/fuyibing/db/v5"
 	"github.com/fuyibing/gmd/v8/app/models"
 	"xorm.io/xorm"
@@ -19,66 +30,14 @@ type (
 func NewRegistryService(ss ...*xorm.Session) *RegistryService {
 	o := &RegistryService{}
 	o.Use(ss...)
-	o.UseConnection(models.ConnectionName)
+	o.UseConnection(Connection)
 	return o
 }
 
-func (o *RegistryService) AddByNames(topic, tag string) (*models.Registry, error) {
-	var (
-		now  = models.NewTimeline()
-		bean = &models.Registry{
-			TopicName:  topic,
-			TopicTag:   tag,
-			GmtCreated: now,
-			GmtUpdated: now,
-		}
-		err error
-	)
-	if _, err = o.Master().Insert(bean); err != nil {
-		return nil, err
-	}
-	return bean, nil
-}
-
-func (o *RegistryService) GetById(id int) (*models.Registry, error) {
-	var (
-		bean   = &models.Registry{}
-		err    error
-		exists bool
-	)
-	if exists, err = o.Slave().Where("id = ?", id).Get(bean); err != nil || !exists {
-		return nil, err
-	}
-	return bean, nil
-}
-
-func (o *RegistryService) GetByNames(topic, tag string) (*models.Registry, error) {
-	var (
-		bean   = &models.Registry{}
-		err    error
-		exists bool
-	)
-	if exists, err = o.Slave().
-		Where("topic_name = ? AND topic_tag = ?", topic, tag).
-		Get(bean); err != nil || !exists {
-		return nil, err
-	}
-	return bean, nil
-}
-
+// ListAll
+// 注册关系列表.
 func (o *RegistryService) ListAll() (list []*models.Registry, err error) {
 	list = make([]*models.Registry, 0)
 	err = o.Slave().Find(&list)
 	return
-}
-
-func (o *RegistryService) SetFilterTag(id int) (int64, error) {
-	return o.Master().Cols(
-		"filter_tag",
-	).Where(
-		"id = ? AND (filter_tag = '' OR filter_tag IS NULL)",
-		id,
-	).Update(&models.Registry{
-		FilterTag: fmt.Sprintf("T%d", id),
-	})
 }

@@ -11,16 +11,28 @@
 // limitations under the License.
 //
 // author: wsfuyibing <websearch@163.com>
-// date: 2023-03-08
+// date: 2023-03-07
 
-package app
+package base
 
 import (
-	"sync"
+	"github.com/fuyibing/util/v8/process"
 )
 
-func init() {
-	new(sync.Once).Do(func() {
-		Config = (&configuration{}).init()
-	})
-}
+type (
+	// ProducerConstructor
+	// 生产者构造器.
+	ProducerConstructor func() ProducerExecutor
+
+	// ProducerExecutor
+	// 生产者执行器.
+	ProducerExecutor interface {
+		// Processor
+		// 类进程.
+		Processor() process.Processor
+
+		// Publish
+		// 发布消息.
+		Publish(payload *Payload) (messageId string, err error)
+	}
+)

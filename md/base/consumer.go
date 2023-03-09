@@ -11,16 +11,28 @@
 // limitations under the License.
 //
 // author: wsfuyibing <websearch@163.com>
-// date: 2023-03-08
+// date: 2023-03-07
 
-package app
+package base
 
 import (
-	"sync"
+	"github.com/fuyibing/util/v8/process"
 )
 
-func init() {
-	new(sync.Once).Do(func() {
-		Config = (&configuration{}).init()
-	})
-}
+type (
+	// ConsumerConstructor
+	// 消费者构造器.
+	ConsumerConstructor func(id, parallel int, name string, handler ConsumerHandler) ConsumerExecutor
+
+	// ConsumerExecutor
+	// 消费者执行器.
+	ConsumerExecutor interface {
+		// Processor
+		// 类进程.
+		Processor() process.Processor
+	}
+
+	// ConsumerHandler
+	// 消费过程.
+	ConsumerHandler func(task *Task, message *Message) (retry bool, err error)
+)

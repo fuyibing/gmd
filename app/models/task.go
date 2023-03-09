@@ -1,88 +1,80 @@
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
 // author: wsfuyibing <websearch@163.com>
-// date: 2023-02-17
+// date: 2023-03-07
 
 package models
 
 type (
 	// Task
-	//
-	// subscription task.
+	// 订阅任务.
 	Task struct {
-		Id     int    `xorm:"id pk autoincr"`
-		Status int    `xorm:"status"`
-		Title  string `xorm:"title"`
-		Remark string `xorm:"remark"`
-
-		// Parallels
-		// maximum consumers per node.
-		//
-		// Default: 1
-		Parallels int `xorm:"parallels"`
-
-		// Concurrency
-		// maximum consuming process per consumer.
-		//
-		// Default: 10
-		Concurrency int32 `xorm:"concurrency"`
-
-		// MaxRetry
-		// maximum consume times if delivered failed.
-		//
-		// If the first consumption fails, wait for 1 minute and
-		// try again. If the fifth consumption fails, wait for 5
-		// minutes and try again.
-		//
-		// Default: 3
-		MaxRetry int `xorm:"max_retry"`
-
-		// DelaySeconds
-		// maximum delay seconds.
-		//
-		// After the message is produced, it will not be consumed
-		// immediately. You need to wait for the specified time
-		// before the first consumption.
-		//
-		// Default: 0 (not delay).
-		DelaySeconds int `xorm:"delay_seconds"`
-
-		// Broadcasting
-		// switch.
-		//
-		// When enabled, each consumer will receive a message, that is,
-		// the same message will be consumed multiple times.
-		//
-		// Accept: Rabbitmq, Rocketmq.
-		// NotAccept: Aliyunmns.
-		Broadcasting int `xorm:"broadcasting"`
-
+		Id         int `xorm:"id pk autoincr"`
 		RegistryId int `xorm:"registry_id"`
+		Status     int `xorm:"status"`
 
-		Handler             string `xorm:"handler"`
-		HandlerTimeout      int    `xorm:"handler_timeout"`
-		HandlerMethod       string `xorm:"handler_method"`
-		HandlerCondition    string `xorm:"handler_condition"`
-		HandlerResponseType int    `xorm:"handler_response_type"`
-		HandlerIgnoreCodes  string `xorm:"handler_ignore_codes"`
+		// +-------------------------------------------------------------------+
+		// + Subscription attributes                                           |
+		// +-------------------------------------------------------------------+
 
-		Failed             string `xorm:"failed"`
-		FailedTimeout      int    `xorm:"failed_timeout"`
-		FailedMethod       string `xorm:"failed_method"`
-		FailedCondition    string `xorm:"failed_condition"`
-		FailedResponseType int    `xorm:"failed_response_type"`
-		FailedIgnoreCodes  string `xorm:"failed_ignore_codes"`
+		Broadcasting int    `yaml:"broadcasting"`
+		Parallels    int    `yaml:"parallels"`
+		Concurrency  int32  `yaml:"concurrency"`
+		MaxRetry     int    `yaml:"max_retry"`
+		DelaySeconds int    `yaml:"delay_seconds"`
+		Title        string `xorm:"title"`
+		Remark       string `xorm:"remark"`
 
-		Succeed             string `xorm:"succeed"`
-		SucceedTimeout      int    `xorm:"succeed_timeout"`
-		SucceedMethod       string `xorm:"succeed_method"`
-		SucceedCondition    string `xorm:"succeed_condition"`
-		SucceedResponseType int    `xorm:"succeed_response_type"`
-		SucceedIgnoreCodes  string `xorm:"succeed_ignore_codes"`
+		// +-------------------------------------------------------------------+
+		// + Normal subscriber                                                 |
+		// +-------------------------------------------------------------------+
 
-		GmtCreated Timeline `xorm:"gmt_created"`
-		GmtUpdated Timeline `xorm:"gmt_updated"`
+		HandlerConditionFilter   string `xorm:"handler_condition_filter"`
+		HandlerConditionKind     string `xorm:"handler_condition_kind"`
+		HandlerDispatcherAddr    string `xorm:"handler_dispatcher_addr"`
+		HandlerDispatcherKind    string `xorm:"handler_dispatcher_kind"`
+		HandlerDispatcherMethod  string `xorm:"handler_dispatcher_method"`
+		HandlerDispatcherTimeout int    `xorm:"handler_dispatcher_timeout"`
+		HandlerResultIgnoreCodes string `xorm:"handler_result_ignore_codes"`
+		HandlerResultKind        string `xorm:"handler_result_kind"`
+
+		// +-------------------------------------------------------------------+
+		// + Dispatch failed notification                                      |
+		// +-------------------------------------------------------------------+
+
+		FailedConditionFilter   string `xorm:"failed_condition_filter"`
+		FailedConditionKind     string `xorm:"failed_condition_kind"`
+		FailedDispatcherAddr    string `xorm:"failed_dispatcher_addr"`
+		FailedDispatcherKind    string `xorm:"failed_dispatcher_kind"`
+		FailedDispatcherMethod  string `xorm:"failed_dispatcher_method"`
+		FailedDispatcherTimeout int    `xorm:"failed_dispatcher_timeout"`
+		FailedResultIgnoreCodes string `xorm:"failed_result_ignore_codes"`
+		FailedResultKind        string `xorm:"failed_result_kind"`
+
+		// +-------------------------------------------------------------------+
+		// + Dispatch succeed notification                                     |
+		// +-------------------------------------------------------------------+
+
+		SucceedConditionFilter   string `xorm:"succeed_condition_filter"`
+		SucceedConditionKind     string `xorm:"succeed_condition_kind"`
+		SucceedDispatcherAddr    string `xorm:"succeed_dispatcher_addr"`
+		SucceedDispatcherKind    string `xorm:"succeed_dispatcher_kind"`
+		SucceedDispatcherMethod  string `xorm:"succeed_dispatcher_method"`
+		SucceedDispatcherTimeout int    `xorm:"succeed_dispatcher_timeout"`
+		SucceedResultIgnoreCodes string `xorm:"succeed_result_ignore_codes"`
+		SucceedResultKind        string `xorm:"succeed_result_kind"`
+
+		GmtCreated Datetime `xorm:"gmt_created"`
+		GmtUpdated Datetime `xorm:"gmt_updated"`
 	}
 )
-
-func (o *Task) IsEnabled() bool {
-	return o.Status == StatusEnabled
-}

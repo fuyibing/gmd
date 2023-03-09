@@ -1,5 +1,6 @@
 # ignore directories.
 
+.bak/
 .git/
 .idea/
 

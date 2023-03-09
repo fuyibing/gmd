@@ -11,16 +11,28 @@
 // limitations under the License.
 //
 // author: wsfuyibing <websearch@163.com>
-// date: 2023-03-08
+// date: 2023-03-07
 
-package app
+package base
 
 import (
-	"sync"
+	"context"
 )
 
-func init() {
-	new(sync.Once).Do(func() {
-		Config = (&configuration{}).init()
-	})
-}
+type (
+	// ResultConstructor
+	// 结果构造器.
+	ResultConstructor func(ignoreCodes string) ResultExecutor
+
+	// ResultExecutor
+	// 结果执行器.
+	ResultExecutor interface {
+		// Name
+		// 执行器名称.
+		Name() string
+
+		// Validate
+		// 校验结果.
+		Validate(ctx context.Context, task, source *Task, body []byte) (code int, err error)
+	}
+)

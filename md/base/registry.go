@@ -11,16 +11,25 @@
 // limitations under the License.
 //
 // author: wsfuyibing <websearch@163.com>
-// date: 2023-03-08
+// date: 2023-03-07
 
-package app
+package base
 
 import (
-	"sync"
+	"github.com/fuyibing/gmd/v8/app/models"
 )
 
-func init() {
-	new(sync.Once).Do(func() {
-		Config = (&configuration{}).init()
-	})
+type (
+	// Registry
+	// 注册关系.
+	Registry struct {
+		Id        int
+		TopicName string
+		TopicTag  string
+		FilterTag string
+	}
+)
+
+func (o *Registry) init(m *models.Registry) *Registry {
+	return o
 }

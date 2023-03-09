@@ -11,9 +11,9 @@
 // limitations under the License.
 //
 // author: wsfuyibing <websearch@163.com>
-// date: 2023-03-08
+// date: 2023-03-07
 
-package app
+package base
 
 import (
 	"sync"
@@ -21,6 +21,8 @@ import (
 
 func init() {
 	new(sync.Once).Do(func() {
-		Config = (&configuration{}).init()
+		Container = (&container{}).init()
+		Memory = (&memory{}).init()
+		Pool = (&pool{}).init()
 	})
 }

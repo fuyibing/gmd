@@ -15,44 +15,25 @@
 
 package models
 
-import (
-	"time"
-)
-
-const (
-	DefaultDatetimeLayout  = "2006-01-02 15:04:05"
-	DefaultTaskParallels   = 1
-	DefaultTaskConcurrency = 10
-	DefaultTaskMaxRetry    = 3
-)
-
-const (
-	StatusDisabled = 0
-	StatusEnabled  = 1
-
-	StatusSucceed    = 1
-	StatusFailed     = 2
-	StatusWaiting    = 3
-	StatusProcessing = 4
-)
-
-var (
-	nilDatetime = time.Unix(0, 0)
-)
-
 type (
-	// Datetime
-	// GMT时间.
-	Datetime string
-)
+	// Message
+	// 队列消息.
+	Message struct {
+		Id       int64   `xorm:"id pk autoincr"`
+		Status   int     `xorm:"status"`
+		Duration float64 `xorm:"duration"`
 
-func Now() Datetime {
-	return Datetime(time.Now().Format(DefaultDatetimeLayout))
-}
+		TaskId  int `xorm:"task_id"`
+		Dequeue int `xorm:"dequeue"`
+		Retry   int `xorm:"retry"`
 
-func (o Datetime) Time() time.Time {
-	if t, te := time.Parse(DefaultDatetimeLayout, string(o)); te == nil {
-		return t
+		PayloadMessageId string `xorm:"payload_message_id"`
+		MessageTime      int64  `xorm:"message_time"`
+		MessageId        string `xorm:"message_id"`
+		MessageBody      string `xorm:"message_body"`
+		ResponseBody     string `xorm:"response_body"`
+
+		GmtCreated Datetime `xorm:"gmt_created"`
+		GmtUpdated Datetime `xorm:"gmt_updated"`
 	}
-	return nilDatetime
-}
+)

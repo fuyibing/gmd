@@ -363,14 +363,16 @@ func (o *Consumer) pipeHandle(ext *rmqp.MessageExt) (retry bool) {
 	}
 
 	// 投递过程.
-	span.Kv().Add("message.received.queue", ext.Queue).
-		Add("message.received.topic", ext.Topic).
+	span.Kv().
 		Add("message.received.message.id", msg.MessageId).
 		Add("message.received.message.time", msg.MessageTime).
-		Add("message.received.delay.ms", time.Now().Sub(time.UnixMilli(msg.MessageTime)).Milliseconds())
-	span.Logger().
-		Info("message received: topic=%s, message-id=%s", ext.Topic, ext.MsgId)
-
+		Add("message.received.task.id", o.id).
+		Add("message.received.task.parallel", o.parallel)
+	span.Logger().Info("message received: topic-name=%s, topic-tag=%s, message-id=%s, message-delay-ms=%d",
+		ext.Topic,
+		ext.GetTags(),
+		ext.MsgId,
+		span.StartTime().Sub(time.UnixMilli(msg.MessageTime)).Milliseconds())
 	retry, _ = o.handler(o.task, msg)
 	return
 }

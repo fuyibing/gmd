@@ -65,7 +65,7 @@ func (o *Message) Release() { Pool.ReleaseMessage(o) }
 func (o *Message) SetContext(ctx context.Context) *Message { o.ctx = ctx; return o }
 func (o *Message) SetDuration(dur time.Duration) *Message  { o.dur = dur; return o }
 func (o *Message) SetError(err error) *Message             { o.err = err; return o }
-func (o *Message) SetResponseBody(str string) *Message     { o.responseBody = str; return o }
+func (o *Message) SetResponseBody(body []byte) *Message    { o.responseBody = string(body); return o }
 
 // +---------------------------------------------------------------------------+
 // + Constructor and access methods                                            |

@@ -21,6 +21,7 @@ import (
 	"github.com/fuyibing/gmd/v8/md/base"
 	"github.com/fuyibing/log/v5"
 	"sync/atomic"
+	"time"
 )
 
 type (
@@ -41,9 +42,7 @@ type (
 	}
 )
 
-func NewConsume() ConsumeExecutor {
-	return (&consume{}).init()
-}
+func NewConsume() ConsumeExecutor { return (&consume{}).init() }
 
 // +---------------------------------------------------------------------------+
 // + Interface methods                                                         |
@@ -102,7 +101,16 @@ func (o *consume) Do(task *base.Task, message *base.Message) (retry bool, err er
 
 	// 投递过程.
 	if subscriber.HasDispatcher() {
-		if body, err = subscriber.GetDispatcher().Dispatch(span.Context(), task, source, message); err != nil {
+		t := time.Now()
+		body, err = subscriber.GetDispatcher().Dispatch(span.Context(), task, source, message)
+		message.SetDuration(time.Now().Sub(t)).SetError(err).SetResponseBody(body)
+
+		// 投递出错.
+		if err != nil {
+			if body == nil {
+				message.SetResponseBody([]byte(err.Error()))
+			}
+
 			span.Logger().Error("dispatch error: %v", err)
 			return
 		}

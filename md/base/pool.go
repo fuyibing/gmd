@@ -46,14 +46,9 @@ type (
 
 func (o *pool) AcquireMessage() (v *Message) {
 	if g := o.messages.Get(); g != nil {
-		v = g.(*Message)
-		v.before()
-		return
+		return g.(*Message)
 	}
-
-	v = (&Message{}).init()
-	v.before()
-	return
+	return &Message{}
 }
 
 func (o *pool) ReleaseMessage(v *Message) {
@@ -63,14 +58,9 @@ func (o *pool) ReleaseMessage(v *Message) {
 
 func (o *pool) AcquireNotification() (v *Notification) {
 	if g := o.notifications.Get(); g != nil {
-		v = g.(*Notification)
-		v.before()
-		return
+		return g.(*Notification)
 	}
-
-	v = (&Notification{}).init()
-	v.before()
-	return v
+	return &Notification{}
 }
 
 func (o *pool) ReleaseNotification(v *Notification) {
@@ -80,14 +70,9 @@ func (o *pool) ReleaseNotification(v *Notification) {
 
 func (o *pool) AcquirePayload() (v *Payload) {
 	if g := o.payloads.Get(); g != nil {
-		v = g.(*Payload)
-		v.before()
-		return v
+		return g.(*Payload)
 	}
-
-	v = (&Payload{}).init()
-	v.before()
-	return v
+	return &Payload{}
 }
 
 func (o *pool) ReleasePayload(v *Payload) {
@@ -99,6 +84,4 @@ func (o *pool) ReleasePayload(v *Payload) {
 // + Constructor and access methods                                            |
 // +---------------------------------------------------------------------------+
 
-func (o *pool) init() *pool {
-	return o
-}
+func (o *pool) init() *pool { return o }

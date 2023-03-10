@@ -33,11 +33,24 @@ type (
 	// BootManager
 	// 根管理器接口.
 	BootManager interface {
+		// Consumer
+		// 消费者管理器.
+		Consumer() ConsumerManager
+
+		// Processor
+		// 类进程.
 		Processor() process.Processor
 
-		Consumer() ConsumerManager
+		// Producer
+		// 生产者管理器.
 		Producer() ProducerManager
+
+		// Remoter
+		// 服务端管理器.
 		Remoter() RemoterManager
+
+		// Retry
+		// 重试管理器.
 		Retry() RetryManager
 
 		// Start
@@ -59,13 +72,15 @@ type (
 	}
 )
 
-func (o *boot) Processor() process.Processor { return o.processor }
+// +---------------------------------------------------------------------------+
+// + Interface methods                                                         |
+// +---------------------------------------------------------------------------+
 
-func (o *boot) Consumer() ConsumerManager { return o.consumer }
-func (o *boot) Producer() ProducerManager { return o.producer }
-func (o *boot) Remoter() RemoterManager   { return o.remoter }
-func (o *boot) Retry() RetryManager       { return o.retry }
-
+func (o *boot) Consumer() ConsumerManager       { return o.consumer }
+func (o *boot) Processor() process.Processor    { return o.processor }
+func (o *boot) Producer() ProducerManager       { return o.producer }
+func (o *boot) Remoter() RemoterManager         { return o.remoter }
+func (o *boot) Retry() RetryManager             { return o.retry }
 func (o *boot) Start(ctx context.Context) error { return o.processor.Start(ctx) }
 func (o *boot) Stop()                           { o.processor.Stop() }
 
@@ -73,19 +88,11 @@ func (o *boot) Stop()                           { o.processor.Stop() }
 // + Event methods                                                             |
 // +---------------------------------------------------------------------------+
 
-func (o *boot) onAfter(_ context.Context) (ignored bool) {
-	return
-}
-
 func (o *boot) onBefore(ctx context.Context) (ignored bool) {
-	span := log.NewSpanFromContext(ctx, "memory.init")
+	span := log.NewSpanFromContext(ctx, "boot.memory.init")
 	defer span.End()
-
-	if err := base.Memory.Reload(span.Context()); err != nil {
-		return true
-	}
-
-	return
+	err := base.Memory.Reload(span.Context())
+	return err != nil
 }
 
 func (o *boot) onCall(ctx context.Context) (ignored bool) {
@@ -108,21 +115,18 @@ func (o *boot) onPanic(_ context.Context, v interface{}) {
 func (o *boot) init() *boot {
 	o.consumer = (&consumer{}).init()
 	o.producer = (&producer{}).init()
-	o.retry = (&retry{}).init()
 	o.remoter = (&remoter{}).init()
+	o.retry = (&retry{}).init()
 
 	o.name = "boot.manager"
-	o.processor = process.New(o.name).
-		Add(
-			o.consumer.Processor(),
-			o.producer.Processor(),
-			o.retry.Processor(),
-			o.remoter.Processor(),
-		).
-		After(o.onAfter).
-		Before(o.onBefore).
-		Callback(o.onCall).
-		Panic(o.onPanic)
+	o.processor = process.New(o.name).Add(
+		o.consumer.Processor(),
+		o.producer.Processor(),
+		o.remoter.Processor(),
+		o.retry.Processor(),
+	).Before(o.onBefore).Callback(o.onCall).Panic(
+		o.onPanic,
+	)
 
 	return o
 }

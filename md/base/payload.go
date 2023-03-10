@@ -86,8 +86,6 @@ func (o *Payload) after() {
 	o.MessageBody = ""
 }
 
-func (o *Payload) before() {}
-
 func (o *Payload) init() *Payload { return o }
 
 func (o *Payload) save() {

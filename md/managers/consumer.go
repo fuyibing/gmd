@@ -44,14 +44,12 @@ type (
 		sync.RWMutex
 
 		adapterConstructor base.ConsumerConstructor
-		adapterUpdated     map[int]int64
 		adapterKeys        map[string]bool
-
-		consume ConsumeExecutor
-
-		name      string
-		processor process.Processor
-		re        chan bool
+		adapterUpdated     map[int]int64
+		executor           ConsumeExecutor
+		name               string
+		processor          process.Processor
+		re                 chan bool
 	}
 )
 
@@ -89,7 +87,7 @@ func (o *consumer) onAdapterFlush(ctx context.Context) (ignored bool) {
 }
 
 func (o *consumer) onAfter(ctx context.Context) (ignored bool) {
-	if o.consume.Idle() {
+	if o.executor.Idle() {
 		return
 	}
 
@@ -137,7 +135,7 @@ func (o *consumer) checkParallel(span tracers.Span, task *base.Task, parallel in
 	}
 
 	// 首次启动.
-	p := o.adapterConstructor(task.Id, parallel, key, o.consume.Do)
+	p := o.adapterConstructor(task.Id, parallel, key, o.executor.Do)
 	o.processor.Add(p.Processor())
 
 	span.Logger().Info("adapter first start: id=%d, parallel=%d", task.Id, parallel)
@@ -205,7 +203,7 @@ func (o *consumer) init() *consumer {
 	o.adapterKeys = make(map[string]bool)
 	o.adapterUpdated = make(map[int]int64)
 
-	o.consume = (&consume{}).init()
+	o.executor = (&executor{}).init()
 	o.name = "consumer.manager"
 	o.processor = process.New(o.name).
 		After(o.onAfter).

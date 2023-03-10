@@ -98,10 +98,6 @@ func (o *Message) after() {
 	o.DispatcherBody = ""
 }
 
-func (o *Message) before() {}
-
-func (o *Message) init() *Message { return o }
-
 func (o *Message) save() {
 	var (
 		affects, beanId int64

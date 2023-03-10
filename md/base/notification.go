@@ -61,10 +61,8 @@ func (o *Notification) String() (str string) {
 // + Constructor and access methods                                            |
 // +---------------------------------------------------------------------------+
 
-func (o *Notification) after() {}
-
-func (o *Notification) before() {}
-
-func (o *Notification) init() *Notification {
-	return o
+func (o *Notification) after() {
+	o.MessageBody = ""
+	o.MessageId = ""
+	o.TaskId = 0
 }

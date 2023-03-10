@@ -44,14 +44,10 @@ func (o *remoter) Processor() process.Processor { return o.processor }
 // + Event methods                                                             |
 // +---------------------------------------------------------------------------+
 
-func (o *remoter) onAfter(_ context.Context) (ignored bool) {
-	return
-}
-
 func (o *remoter) onBefore(_ context.Context) (ignored bool) {
-	if caller := base.Container.GetRemoter(); caller != nil {
-		if executor := caller(); executor != nil {
-			o.executor = executor
+	if fn := base.Container.GetRemoter(); fn != nil {
+		if ex := fn(); ex != nil {
+			o.executor = ex
 			return
 		}
 	}
@@ -80,7 +76,6 @@ func (o *remoter) onPanic(_ context.Context, v interface{}) {
 func (o *remoter) init() *remoter {
 	o.name = "remoter.manager"
 	o.processor = process.New(o.name).
-		After(o.onAfter).
 		Before(o.onBefore).
 		Callback(o.onCall).
 		Panic(o.onPanic)

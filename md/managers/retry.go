@@ -42,14 +42,6 @@ func (o *retry) Processor() process.Processor { return o.processor }
 // + Event methods                                                             |
 // +---------------------------------------------------------------------------+
 
-func (o *retry) onAfter(_ context.Context) (ignored bool) {
-	return
-}
-
-func (o *retry) onBefore(_ context.Context) (ignored bool) {
-	return
-}
-
 func (o *retry) onCall(ctx context.Context) (ignored bool) {
 	for {
 		select {
@@ -70,8 +62,6 @@ func (o *retry) onPanic(_ context.Context, v interface{}) {
 func (o *retry) init() *retry {
 	o.name = "retry.manager"
 	o.processor = process.New(o.name).
-		After(o.onAfter).
-		Before(o.onBefore).
 		Callback(o.onCall).
 		Panic(o.onPanic)
 

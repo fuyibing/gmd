@@ -37,18 +37,18 @@ type (
 		Idle() bool
 	}
 
-	consume struct {
+	executor struct {
 		consuming, notifying, releasing int32
 	}
 )
 
-func NewConsume() ConsumeExecutor { return (&consume{}).init() }
+func NewConsume() ConsumeExecutor { return (&executor{}).init() }
 
 // +---------------------------------------------------------------------------+
 // + Interface methods                                                         |
 // +---------------------------------------------------------------------------+
 
-func (o *consume) Do(task *base.Task, message *base.Message) (retry bool, err error) {
+func (o *executor) Do(task *base.Task, message *base.Message) (retry bool, err error) {
 	atomic.AddInt32(&o.consuming, 1)
 
 	var (
@@ -108,7 +108,7 @@ func (o *consume) Do(task *base.Task, message *base.Message) (retry bool, err er
 	return
 }
 
-func (o *consume) Idle() bool {
+func (o *executor) Idle() bool {
 	return atomic.LoadInt32(&o.consuming) == 0 &&
 		atomic.LoadInt32(&o.releasing) == 0 &&
 		atomic.LoadInt32(&o.notifying) == 0
@@ -119,7 +119,7 @@ func (o *consume) Idle() bool {
 // +---------------------------------------------------------------------------+
 
 // 检查任务.
-func (o *consume) checkTask(task *base.Task, message *base.Message) (source *base.Task, subscriber base.Subscriber, err error) {
+func (o *executor) checkTask(task *base.Task, message *base.Message) (source *base.Task, subscriber base.Subscriber, err error) {
 	message.TaskId = task.Id
 
 	// 失败通知.
@@ -164,7 +164,7 @@ func (o *consume) checkTask(task *base.Task, message *base.Message) (source *bas
 }
 
 // 条件校验.
-func (o *consume) doCondition(subscriber base.Subscriber, task *base.Task, message *base.Message) (ignored bool, err error) {
+func (o *executor) doCondition(subscriber base.Subscriber, task *base.Task, message *base.Message) (ignored bool, err error) {
 	if !subscriber.HasCondition() {
 		return
 	}
@@ -172,7 +172,7 @@ func (o *consume) doCondition(subscriber base.Subscriber, task *base.Task, messa
 }
 
 // 投递过程.
-func (o *consume) doDispatch(subscriber base.Subscriber, task, source *base.Task, message *base.Message) (body []byte, err error) {
+func (o *executor) doDispatch(subscriber base.Subscriber, task, source *base.Task, message *base.Message) (body []byte, err error) {
 	// 未定义投递规则.
 	if !subscriber.HasDispatcher() {
 		span := log.NewSpanFromContext(message.GetContext(), "message.dispatch.undefined")
@@ -188,14 +188,14 @@ func (o *consume) doDispatch(subscriber base.Subscriber, task, source *base.Task
 }
 
 // 无效任务.
-func (o *consume) doIllegal(message *base.Message, err error) {
+func (o *executor) doIllegal(message *base.Message, err error) {
 	span := log.NewSpanFromContext(message.GetContext(), "message.illegal")
 	span.Logger().Error("message illegal: %v", err)
 	span.End()
 }
 
 // 发送通知.
-func (o *consume) doNotification(task *base.Task, message *base.Message) {
+func (o *executor) doNotification(task *base.Task, message *base.Message) {
 	atomic.AddInt32(&o.notifying, 1)
 	go func() {
 		var (
@@ -271,7 +271,7 @@ func (o *consume) doNotification(task *base.Task, message *base.Message) {
 }
 
 // 释放回池.
-func (o *consume) doRelease(message *base.Message) {
+func (o *executor) doRelease(message *base.Message) {
 	atomic.AddInt32(&o.releasing, 1)
 	go func() {
 		defer atomic.AddInt32(&o.releasing, -1)
@@ -280,11 +280,11 @@ func (o *consume) doRelease(message *base.Message) {
 }
 
 // 校验结果.
-func (o *consume) doResult(subscriber base.Subscriber, task, source *base.Task, message *base.Message, body []byte) (code int, err error) {
+func (o *executor) doResult(subscriber base.Subscriber, task, source *base.Task, message *base.Message, body []byte) (code int, err error) {
 	if subscriber.HasResult() {
 		code, err = subscriber.GetResult().Validate(task, source, message, body)
 	}
 	return
 }
 
-func (o *consume) init() *consume { return o }
+func (o *executor) init() *executor { return o }

@@ -84,9 +84,8 @@ func (o *producer) Publish(payload *base.Payload) (err error) {
 }
 
 func (o *producer) PublishSync(payload *base.Payload) (err error) {
-	if err = o.send(payload); err != nil {
-		o.release(payload)
-	}
+	err = o.send(payload)
+	o.release(payload)
 	return
 }
 
@@ -113,9 +112,9 @@ func (o *producer) onAdapterBound(_ context.Context) (ignored bool) {
 }
 
 func (o *producer) onAdapterCheck(_ context.Context) (ignored bool) {
-	if caller := base.Container.GetProducer(); caller != nil {
-		if executor := caller(); executor != nil {
-			o.executor = executor
+	if fn := base.Container.GetProducer(); fn != nil {
+		if ex := fn(); ex != nil {
+			o.executor = ex
 			return
 		}
 	}

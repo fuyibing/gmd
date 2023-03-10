@@ -21,13 +21,6 @@ import (
 	"sync"
 )
 
-const (
-	BucketBatch       = 100
-	BucketCapacity    = 30000
-	BucketConcurrency = 50
-	BucketFrequency   = 300
-)
-
 var (
 	ErrBucketIsFull = fmt.Errorf("bucket is full")
 )
@@ -67,9 +60,9 @@ type (
 
 func NewBucket(capacity int) Bucket { return (&bucket{capacity: capacity}).init() }
 
-// /////////////////////////////////////////////////////////////////////////////
-// Interface methods
-// /////////////////////////////////////////////////////////////////////////////
+// +---------------------------------------------------------------------------+
+// + Interface methods                                                         |
+// +---------------------------------------------------------------------------+
 
 func (o *bucket) Add(v *base.Payload) (total int, err error) {
 	o.Lock()
@@ -126,9 +119,9 @@ func (o *bucket) Popn(limit int) (vs []*base.Payload, total, count int) {
 	return
 }
 
-// /////////////////////////////////////////////////////////////
-// Access methods
-// /////////////////////////////////////////////////////////////
+// +---------------------------------------------------------------------------+
+// + Constructor and access methods                                            |
+// +---------------------------------------------------------------------------+
 
 func (o *bucket) init() *bucket {
 	o.reset()

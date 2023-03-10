@@ -72,6 +72,9 @@ func (o *Consumer) Processor() process.Processor { return o.processor }
 // +---------------------------------------------------------------------------+
 
 func (o *Consumer) onCall(ctx context.Context) (ignored bool) {
+	log.Info("<%s.%s> channel listening", o.name, o.key)
+	defer log.Info("<%s.%s> channel closed", o.name, o.key)
+
 	for {
 		select {
 		case <-ctx.Done():

@@ -124,8 +124,9 @@ func (o *PostBatch) Range(parent tracers.Span, registry *base.Registry, messageB
 		payload = base.Pool.AcquirePayload().SetContext(span.Context())
 	)
 
-	span.Kv().Add("payload.created.batch.hash", hash)
-	span.Kv().Add("payload.created.batch.offset", offset)
+	span.Kv().
+		Add("payload.created.batch.hash", hash).
+		Add("payload.created.batch.offset", offset)
 
 	defer span.End()
 

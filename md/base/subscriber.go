@@ -52,9 +52,10 @@ func NewSubscriber() Subscriber { return (&subscriber{}).init() }
 func (o *subscriber) GetCondition() ConditionExecutor   { return o.ce }
 func (o *subscriber) GetDispatcher() DispatcherExecutor { return o.de }
 func (o *subscriber) GetResult() ResultExecutor         { return o.re }
-func (o *subscriber) HasCondition() bool                { return o.ch }
-func (o *subscriber) HasDispatcher() bool               { return o.dh }
-func (o *subscriber) HasResult() bool                   { return o.rh }
+
+func (o *subscriber) HasCondition() bool  { return o.ch }
+func (o *subscriber) HasDispatcher() bool { return o.dh }
+func (o *subscriber) HasResult() bool     { return o.rh }
 
 func (o *subscriber) SetCondition(kind, filter string) Subscriber {
 	if caller, exists := Container.GetCondition(kind); exists {

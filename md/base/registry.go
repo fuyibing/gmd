@@ -24,10 +24,26 @@ import (
 type (
 	// Registry
 	// 注册关系.
+	//
+	// 此配置用于控制生产/发布消息, 只有注册过的主题/标签关系才允许发布到MQ服务器,
+	// 反之禁止发布.
+	//
+	// 不同的MQ服务器, 有大小写敏感差异, 注册关系统一以大写格式输出.
 	Registry struct {
-		Id        int
+		Id int
+
+		// 主题名称.
+		// 例如: FINANCE
 		TopicName string
-		TopicTag  string
+
+		// 主题标签.
+		// 例如: CREATED, PAID
+		TopicTag string
+
+		// 过滤标签.
+		//
+		// 在 AliyunMNS 服务中, TopicTag 有最长 16 个字符限制, 执行订阅时使用此
+		// 字段替代.
 		FilterTag string
 	}
 )
@@ -37,8 +53,10 @@ func (o *Registry) init(m *models.Registry) *Registry {
 	o.TopicName = strings.ToUpper(m.TopicName)
 	o.TopicTag = strings.ToUpper(m.TopicTag)
 
+	// 标签重置.
 	if o.FilterTag = strings.ToUpper(m.FilterTag); o.FilterTag == "" {
 		o.FilterTag = fmt.Sprintf("T%d", m.Id)
 	}
+
 	return o
 }

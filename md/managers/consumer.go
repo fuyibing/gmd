@@ -73,15 +73,6 @@ func (o *consumer) Reload() {
 // + Event methods                                                             |
 // +---------------------------------------------------------------------------+
 
-func (o *consumer) onAfter(ctx context.Context) (ignored bool) {
-	if o.consume.Idle() {
-		return
-	}
-
-	time.Sleep(time.Millisecond * 100)
-	return o.onAfter(ctx)
-}
-
 func (o *consumer) onAdapterCheck(_ context.Context) (ignored bool) {
 	if constructor := base.Container.GetConsumer(); constructor != nil {
 		o.adapterConstructor = constructor
@@ -95,6 +86,15 @@ func (o *consumer) onAdapterCheck(_ context.Context) (ignored bool) {
 func (o *consumer) onAdapterFlush(ctx context.Context) (ignored bool) {
 	go o.flush(ctx)
 	return
+}
+
+func (o *consumer) onAfter(ctx context.Context) (ignored bool) {
+	if o.consume.Idle() {
+		return
+	}
+
+	time.Sleep(time.Millisecond * 100)
+	return o.onAfter(ctx)
 }
 
 func (o *consumer) onListen(ctx context.Context) (ignored bool) {
@@ -123,34 +123,42 @@ func (o *consumer) onPanic(_ context.Context, v interface{}) {
 // + Constructor and access methods                                            |
 // +---------------------------------------------------------------------------+
 
-func (o *consumer) init() *consumer {
-	o.adapterKeys = make(map[string]bool)
-	o.adapterUpdated = make(map[int]int64)
+func (o *consumer) checkParallel(span tracers.Span, task *base.Task, parallel int, restart bool) (key string) {
+	key = fmt.Sprintf("%d.%d", task.Id, parallel)
 
-	o.consume = (&consume{}).init()
-	o.name = "consumer.manager"
-	o.processor = process.New(o.name).
-		After(o.onAfter).
-		Before(o.onAdapterCheck).
-		Callback(o.onAdapterFlush, o.onListen).
-		Panic(o.onPanic)
-	return o
-}
+	// 已经启动.
+	if p, exists := o.processor.Get(key); exists {
+		if restart {
+			p.Restart()
+		}
 
-// loader
-// 内存重载.
-func (o *consumer) loader() {
-	span := log.NewSpan("consumer.memory.reload")
-	defer span.End()
-
-	// 更新内存.
-	if base.Memory.Reload(span.Context()) != nil {
+		span.Logger().Info("adapter started already: id=%d, parallel=%d, restart=%v", task.Id, parallel, restart)
 		return
 	}
 
-	// 应用内存.
-	// 刷新基于内存数据启动的消费者适配器.
-	o.flush(span.Context())
+	// 首次启动.
+	p := o.adapterConstructor(task.Id, parallel, key, o.consume.Do)
+	o.processor.Add(p.Processor())
+
+	span.Logger().Info("adapter first start: id=%d, parallel=%d", task.Id, parallel)
+	_ = o.processor.StartChild(key)
+	return
+}
+
+func (o *consumer) checkUpdated(span tracers.Span, task *base.Task) (restart bool) {
+	o.Lock()
+	defer o.Unlock()
+
+	span.Logger().Info("task loaded: id=%d, updated=%s", task.Id, time.Unix(task.Updated, 0).Format("2006-01-02 15:04:05"))
+
+	// 不需重启.
+	if n, ok := o.adapterUpdated[task.Id]; ok && n == task.Updated {
+		return false
+	}
+
+	// 需要重启.
+	o.adapterUpdated[task.Id] = task.Updated
+	return true
 }
 
 func (o *consumer) flush(ctx context.Context) {
@@ -193,40 +201,30 @@ func (o *consumer) flush(ctx context.Context) {
 	o.Unlock()
 }
 
-func (o *consumer) checkParallel(span tracers.Span, task *base.Task, parallel int, restart bool) (key string) {
-	key = fmt.Sprintf("%d.%d", task.Id, parallel)
+func (o *consumer) init() *consumer {
+	o.adapterKeys = make(map[string]bool)
+	o.adapterUpdated = make(map[int]int64)
 
-	// 已经启动.
-	if p, exists := o.processor.Get(key); exists {
-		if restart {
-			p.Restart()
-		}
+	o.consume = (&consume{}).init()
+	o.name = "consumer.manager"
+	o.processor = process.New(o.name).
+		After(o.onAfter).
+		Before(o.onAdapterCheck).
+		Callback(o.onAdapterFlush, o.onListen).
+		Panic(o.onPanic)
+	return o
+}
 
-		span.Logger().Info("adapter started already: id=%d, parallel=%d, restart=%v", task.Id, parallel, restart)
+func (o *consumer) loader() {
+	span := log.NewSpan("consumer.memory.reload")
+	defer span.End()
+
+	// 更新内存.
+	if base.Memory.Reload(span.Context()) != nil {
 		return
 	}
 
-	// 首次启动.
-	p := o.adapterConstructor(task.Id, parallel, key, o.consume.Do)
-	o.processor.Add(p.Processor())
-
-	span.Logger().Info("adapter first start: id=%d, parallel=%d", task.Id, parallel)
-	_ = o.processor.StartChild(key)
-	return
-}
-
-func (o *consumer) checkUpdated(span tracers.Span, task *base.Task) (restart bool) {
-	o.Lock()
-	defer o.Unlock()
-
-	span.Logger().Info("task loaded: id=%d, updated=%s", task.Id, time.Unix(task.Updated, 0).Format("2006-01-02 15:04:05"))
-
-	// 不需重启.
-	if n, ok := o.adapterUpdated[task.Id]; ok && n == task.Updated {
-		return false
-	}
-
-	// 需要重启.
-	o.adapterUpdated[task.Id] = task.Updated
-	return true
+	// 应用内存.
+	// 刷新基于内存数据启动的消费者适配器.
+	o.flush(span.Context())
 }

@@ -28,16 +28,28 @@ type (
 		Title   string
 		Updated int64
 
+		// +-------------------------------------------------------------------+
+		// + Subscription settings                                             |
+		// +-------------------------------------------------------------------+
+
 		Broadcasting bool
 		Parallels    int
 		Concurrency  int32
 		MaxRetry     int
 		DelaySeconds int
 
+		// +-------------------------------------------------------------------+
+		// + Registry settings                                                 |
+		// +-------------------------------------------------------------------+
+
 		RegistryId int
 		TopicName  string
 		TopicTag   string
 		FilterTag  string
+
+		// +-------------------------------------------------------------------+
+		// + Calculation properties for subscriber & notification              |
+		// +-------------------------------------------------------------------+
 
 		Subscriber,
 		SubscriberFailed,
@@ -66,19 +78,19 @@ func (o *Task) IsNotificationFailed() bool { return o.isNotificationFailed }
 func (o *Task) IsNotificationSucceed() bool { return o.isNotificationSucceed }
 
 // IsSubscriber
-// 常规订阅状态.
+// 通用订阅.
 //
 // 订阅任务表 (scheme.task.handler_dispatcher_addr) 已配置回调地址.
 func (o *Task) IsSubscriber() bool { return o.isSubscriber }
 
 // IsSubscriberFailed
-// 失败订阅状态.
+// 订阅投递失败通知.
 //
 // 订阅任务表 (scheme.task.failed_dispatcher_addr) 已配置回调地址.
 func (o *Task) IsSubscriberFailed() bool { return o.isSubscriberFailed }
 
 // IsSubscriberSucceed
-// 成功订阅状态.
+// 订阅投递成功通知.
 //
 // 订阅任务表 (scheme.task.succeed_dispatcher_addr) 已配置回调地址.
 func (o *Task) IsSubscriberSucceed() bool { return o.isSubscriberSucceed }

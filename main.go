@@ -18,6 +18,8 @@ package main
 import (
 	"context"
 	"fmt"
+	cc "github.com/fuyibing/console/v3"
+	cm "github.com/fuyibing/console/v3/managers"
 	"github.com/fuyibing/gmd/v8/app"
 	"github.com/fuyibing/gmd/v8/app/controllers"
 	"github.com/fuyibing/gmd/v8/app/middlewares"
@@ -37,9 +39,12 @@ type (
 	// GmdApp
 	// 消息分发.
 	GmdApp struct {
-		Cancel    context.CancelFunc
-		Ctx       context.Context
-		Framework *iris.Application
+		Cancel         context.CancelFunc
+		ConsoleCommand cm.Command
+		ConsoleManager cm.Manager
+		Ctx            context.Context
+		Err            error
+		Framework      *iris.Application
 	}
 )
 
@@ -93,6 +98,21 @@ func (o *GmdApp) Stop() { o.Cancel() }
 // + Constructor and access methods                                            |
 // +---------------------------------------------------------------------------+
 
+func (o *GmdApp) cmdRegister() {
+	o.ConsoleCommand = cm.NewCommand("start").
+		SetDescription("start application").
+		SetHandler(o.gmdRunner)
+
+	if o.ConsoleManager, o.Err = cc.Latest(); o.Err == nil {
+		o.Err = o.ConsoleManager.AddCommand(o.ConsoleCommand)
+	}
+}
+
+func (o *GmdApp) gmdRunner(_ cm.Manager, _ cm.Arguments) error {
+	o.Start()
+	return nil
+}
+
 func (o *GmdApp) init() *GmdApp {
 	iris.RegisterOnInterrupt(o.OnInterrupt)
 
@@ -103,6 +123,7 @@ func (o *GmdApp) init() *GmdApp {
 	o.initDebugProfile()
 	o.initMiddlewares()
 
+	o.cmdRegister()
 	return o
 }
 
@@ -144,5 +165,6 @@ func (o *GmdApp) initMiddlewares() {
 func init() { App = (&GmdApp{}).init() }
 
 func main() {
-	App.Start()
+	App.ConsoleManager.RunTerminal()
+	// App.Start()
 }

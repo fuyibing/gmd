@@ -23,8 +23,6 @@ import (
 
 // Controller
 // 默认.
-//
-// @RoutePrefix(/)
 type Controller struct {
 }
 

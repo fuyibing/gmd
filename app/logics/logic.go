@@ -39,10 +39,10 @@ func New(i iris.Context, logics ...Logic) (res interface{}) {
 	var (
 		req = i.Request()
 
-		// 请求链.
-		span = log.NewSpanFromRequest(i.Request(), fmt.Sprintf("%s %s",
-			req.Method, req.URL.Path,
-		))
+		// 链路追踪.
+		span = log.NewSpanFromRequest(i.Request(),
+			fmt.Sprintf("%s %s", req.Method, req.URL.Path),
+		)
 	)
 
 	// 结束请求.

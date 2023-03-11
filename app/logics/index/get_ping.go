@@ -28,7 +28,7 @@ type (
 	}
 
 	GetPingResponse struct {
-		Goroutines int `json:"goroutines" label:"协程数"`
+		Goroutines int `json:"goroutines" label:"协程数" mock:"12"`
 	}
 )
 

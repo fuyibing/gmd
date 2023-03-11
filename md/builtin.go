@@ -30,6 +30,8 @@ type (
 	builtinRemoter  string
 )
 
+// New
+// 消费者构造器.
 func (o builtinConsumer) New() base.ConsumerConstructor {
 	switch strings.ToLower(string(o)) {
 	case "rocketmq":
@@ -38,6 +40,8 @@ func (o builtinConsumer) New() base.ConsumerConstructor {
 	return nil
 }
 
+// New
+// 生产者构造器.
 func (o builtinProducer) New() base.ProducerConstructor {
 	switch strings.ToLower(string(o)) {
 	case "rocketmq":
@@ -46,6 +50,8 @@ func (o builtinProducer) New() base.ProducerConstructor {
 	return nil
 }
 
+// New
+// 服务端构造器.
 func (o builtinRemoter) New() base.RemoterConstructor {
 	switch strings.ToLower(string(o)) {
 	case "rocketmq":
@@ -55,14 +61,20 @@ func (o builtinRemoter) New() base.RemoterConstructor {
 }
 
 var (
+	// builtinConditions
+	// 内置条件过滤器.
 	builtinConditions = map[string]base.ConditionConstructor{
 		"el": el_condition.New,
 	}
 
+	// builtinDispatchers
+	// 内置投递管理器.
 	builtinDispatchers = map[string]base.DispatcherConstructor{
 		"http_json": http_json.New,
 	}
 
+	// builtinResults
+	// 内置结果解析器.
 	builtinResults = map[string]base.ResultConstructor{
 		"json_errno": json_errno.New,
 	}

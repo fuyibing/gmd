@@ -67,8 +67,8 @@ type (
 		name      string
 		processor process.Processor
 		producer  ProducerManager
-		retry     RetryManager
 		remoter   RemoterManager
+		retry     RetryManager
 	}
 )
 

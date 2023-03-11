@@ -23,7 +23,7 @@ import (
 
 var (
 	// Registry
-	// 注册关系.
+	// 控制器注册中心.
 	Registry map[string]interface{}
 )
 

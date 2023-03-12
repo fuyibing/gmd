@@ -25,19 +25,10 @@ const (
 )
 
 type (
-	// DispatcherConstructor
-	// 分发构造器.
 	DispatcherConstructor func(addr, method string, timeout int) DispatcherExecutor
 
-	// DispatcherExecutor
-	// 分发执行器.
 	DispatcherExecutor interface {
-		// Dispatch
-		// 分发过程.
 		Dispatch(task, source *Task, message *Message) (body []byte, err error)
-
-		// Name
-		// 执行器名称.
 		Name() string
 	}
 )

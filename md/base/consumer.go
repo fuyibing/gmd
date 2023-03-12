@@ -20,19 +20,11 @@ import (
 )
 
 type (
-	// ConsumerConstructor
-	// 消费者构造器.
 	ConsumerConstructor func(id, parallel int, name string, handler ConsumerHandler) ConsumerExecutor
 
-	// ConsumerExecutor
-	// 消费者执行器.
 	ConsumerExecutor interface {
-		// Processor
-		// 类进程.
 		Processor() process.Processor
 	}
 
-	// ConsumerHandler
-	// 消费过程.
 	ConsumerHandler func(task *Task, message *Message) (retry bool, err error)
 )

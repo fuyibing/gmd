@@ -32,27 +32,21 @@ import (
 )
 
 type (
-	// PostBatch
-	// 发布消息.
 	PostBatch struct {
 		request  *PostBatchRequest
 		response *PostBatchResponse
 	}
 
-	// PostBatchRequest
-	// 消息入参.
 	PostBatchRequest struct {
-		Topic         string        `json:"topic" label:"主题名" mock:"Topic" validate:"required,gte=2,lte=30"`
-		Tag           string        `json:"tag" label:"标签名" mock:"tag" validate:"required,gte=2,lte=60"`
-		Messages      []interface{} `json:"messages" label:"消息列表" validate:"required,gte=1,lte=100" desc:"接受JSON字符串或JSON对象"`
-		MessageBodies []string      `json:"-" label:"消息列表" validate:"required,gte=1,lte=100"`
+		Topic         string        `json:"topic" label:"Topic name" mock:"Topic" validate:"required,gte=2,lte=30"`
+		Tag           string        `json:"tag" label:"Topic tag" mock:"tag" validate:"required,gte=2,lte=60"`
+		Messages      []interface{} `json:"messages" label:"Message list" validate:"required,gte=1,lte=100" desc:"Allow json string list or json object list"`
+		MessageBodies []string      `json:"-" label:"Message list" validate:"required,gte=1,lte=100"`
 	}
 
-	// PostBatchResponse
-	// 发布结果.
 	PostBatchResponse struct {
-		Hash  string `json:"hash" label:"哈希码" mock:"CFD44CFBCB0D451A90E7EE193785F289"`
-		Count int    `json:"count" label:"消息数" mock:"30"`
+		Hash  string `json:"hash" label:"Hash code" mock:"CFD44CFBCB0D451A90E7EE193785F289"`
+		Count int    `json:"count" label:"Message count" mock:"30"`
 	}
 )
 

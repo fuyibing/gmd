@@ -29,7 +29,7 @@ type (
 	}
 
 	GetPingResponse struct {
-		Goroutines int `json:"goroutines" label:"协程数" mock:"12"`
+		Goroutines int `json:"goroutines" label:"Running goroutine count" mock:"12"`
 	}
 )
 
@@ -41,9 +41,7 @@ func NewGetPing() logics.LogicHandler {
 
 func (o *GetPing) Release() {}
 
-func (o *GetPing) Run(span tracers.Span, i iris.Context) interface{} {
-
+func (o *GetPing) Run(_ tracers.Span, _ iris.Context) interface{} {
 	o.response.Goroutines = runtime.NumGoroutine()
-
 	return response.With.Data(o.response)
 }

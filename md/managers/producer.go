@@ -27,21 +27,9 @@ import (
 )
 
 type (
-	// ProducerManager
-	// 生产者管理器.
 	ProducerManager interface {
-		// Processor
-		// 类进程.
 		Processor() process.Processor
-
-		// Publish
-		// 发布消息/异步.
 		Publish(payload *base.Payload) error
-
-		// PublishSync
-		// 发布消息/同步.
-		//
-		// 此模式为阻塞式的, 必须等MQ服务端返回结果(消息ID)后再结束.
 		PublishSync(payload *base.Payload) error
 	}
 
@@ -70,14 +58,12 @@ func (o *producer) Publish(payload *base.Payload) (err error) {
 
 	defer span.End()
 
-	// 消息入桶.
 	if total, err = o.bucket.Add(payload); err != nil {
 		span.Logger().Error("payload push into bucket: %v", err)
 		o.release(payload)
 		return err
 	}
 
-	// 异步取出.
 	span.Logger().Info("payload push into bucket: total=%d", total)
 	go o.pop()
 	return

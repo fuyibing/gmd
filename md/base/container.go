@@ -20,61 +20,22 @@ import (
 )
 
 var (
-	// Container
-	// 容器操作.
 	Container ContainerOperation
 )
 
 type (
-	// ContainerOperation
-	// 容器管理.
 	ContainerOperation interface {
-		// GetConsumer
-		// 消费者构造器.
 		GetConsumer() (constructor ConsumerConstructor)
-
-		// GetProducer
-		// 生产者构造器.
 		GetProducer() (constructor ProducerConstructor)
-
-		// GetRemoter
-		// 服务端构造器.
 		GetRemoter() (constructor RemoterConstructor)
-
-		// GetCondition
-		// 条件构造器.
 		GetCondition(key string) (constructor ConditionConstructor, exists bool)
-
-		// GetDispatcher
-		// 分发构造器.
 		GetDispatcher(key string) (constructor DispatcherConstructor, exists bool)
-
-		// GetResult
-		// 结果构造器.
 		GetResult(key string) (constructor ResultConstructor, exists bool)
-
-		// RegisterConsumer
-		// 注册消费者构造器.
 		RegisterConsumer(constructor ConsumerConstructor)
-
-		// RegisterProducer
-		// 注册生产者构造器.
 		RegisterProducer(constructor ProducerConstructor)
-
-		// RegisterRemoter
-		// 注册服务端构造器.
 		RegisterRemoter(v RemoterConstructor)
-
-		// RegisterCondition
-		// 注册条件构造器.
 		RegisterCondition(key string, constructor ConditionConstructor)
-
-		// RegisterDispatcher
-		// 注册分发构造器.
 		RegisterDispatcher(key string, constructor DispatcherConstructor)
-
-		// RegisterResult
-		// 注册结果构造器.
 		RegisterResult(key string, constructor ResultConstructor)
 	}
 

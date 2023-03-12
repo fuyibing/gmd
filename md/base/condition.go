@@ -16,19 +16,10 @@
 package base
 
 type (
-	// ConditionConstructor
-	// 条件构造器.
 	ConditionConstructor func(str string) ConditionExecutor
 
-	// ConditionExecutor
-	// 条件执行器.
 	ConditionExecutor interface {
-		// Name
-		// 执行器名称.
 		Name() string
-
-		// Validate
-		// 校验条件.
 		Validate(task *Task, message *Message) (ignored bool, err error)
 	}
 )

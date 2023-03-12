@@ -25,15 +25,8 @@ import (
 )
 
 type (
-	// ConsumeExecutor
-	// 消费管理.
 	ConsumeExecutor interface {
-		// Do
-		// 消费过程.
 		Do(task *base.Task, message *base.Message) (retry bool, err error)
-
-		// Idle
-		// 是否空闲.
 		Idle() bool
 	}
 

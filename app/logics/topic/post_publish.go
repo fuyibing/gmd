@@ -30,26 +30,20 @@ import (
 )
 
 type (
-	// PostPublish
-	// 发布消息.
 	PostPublish struct {
 		request  *PostPublishRequest
 		response *PostPublishResponse
 	}
 
-	// PostPublishRequest
-	// 消息入参.
 	PostPublishRequest struct {
-		Topic       string      `json:"topic" label:"主题名" mock:"Topic" validate:"required,gte=2,lte=30"`
-		Tag         string      `json:"tag" label:"标签名" mock:"tag" validate:"required,gte=2,lte=60"`
-		Message     interface{} `json:"message" label:"消息正文" validate:"required" desc:"接JSON字符串或JSON对象"`
-		MessageBody string      `json:"-" label:"消息正文" validate:"required,gte=1,lte=65536"`
+		Topic       string      `json:"topic" label:"Topic name" mock:"Topic" validate:"required,gte=2,lte=30"`
+		Tag         string      `json:"tag" label:"Topic tag" mock:"tag" validate:"required,gte=2,lte=60"`
+		Message     interface{} `json:"message" label:"Message body" validate:"required" desc:"Accept json string or json object"`
+		MessageBody string      `json:"-" label:"Message body" validate:"required,gte=1,lte=65536"`
 	}
 
-	// PostPublishResponse
-	// 发布结果.
 	PostPublishResponse struct {
-		Hash string `json:"hash" label:"哈希码" mock:"CFD44CFBCB0D451A90E7EE193785F289"`
+		Hash string `json:"hash" label:"Hash code" mock:"CFD44CFBCB0D451A90E7EE193785F289"`
 	}
 )
 

@@ -27,8 +27,6 @@ import (
 )
 
 type (
-	// Message
-	// 消息结构.
 	Message struct {
 		ctx          context.Context
 		dur          time.Duration
@@ -37,21 +35,12 @@ type (
 
 		TaskId int
 
-		Dequeue     int
-		MessageBody string
-		MessageId   string
-		MessageTime int64
-
-		// 主题消息ID.
+		Dequeue          int
+		MessageBody      string
+		MessageId        string
+		MessageTime      int64
 		PayloadMessageId string
 
-		// 原始正文.
-		//
-		// 字段 MessageBody 为自来队列的原始消息, 本字段 DispatcherBody 为投递
-		// 消息时使用的正文.
-		//
-		// 1. 原始消息.
-		// 2. 通知消息.
 		DispatcherBody string
 	}
 )

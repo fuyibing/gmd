@@ -60,8 +60,6 @@ func (o *retry) consumeMessage() {
 func (o *retry) publishPayload() {
 }
 
-// onCall
-// 监听信号.
 func (o *retry) onCall(ctx context.Context) (ignored bool) {
 	dc := time.Duration(app.Config.GetConsumer().GetRetryFrequency()) * time.Second
 	tc := time.NewTimer(dc)

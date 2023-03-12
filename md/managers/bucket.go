@@ -26,27 +26,11 @@ var (
 )
 
 type (
-	// Bucket
-	// 数据桶.
 	Bucket interface {
-		// Add
-		// 添加消息.
 		Add(v *base.Payload) (total int, err error)
-
-		// Count
-		// 桶消息数.
 		Count() int
-
-		// IsEmpty
-		// 是否为空.
 		IsEmpty() bool
-
-		// Pop
-		// 取出一条.
 		Pop() (v *base.Payload, exists bool)
-
-		// Popn
-		// 取出N条.
 		Popn(limit int) (vs []*base.Payload, total, count int)
 	}
 
@@ -102,7 +86,6 @@ func (o *bucket) Popn(limit int) (vs []*base.Payload, total, count int) {
 		return
 	}
 
-	// 全部取出.
 	if limit >= total {
 		count = total
 		vs = o.cached[:]
@@ -110,11 +93,9 @@ func (o *bucket) Popn(limit int) (vs []*base.Payload, total, count int) {
 		return
 	}
 
-	// 取出片段.
 	count = limit
 	vs = o.cached[0:count]
 
-	// 重置内存.
 	o.cached = o.cached[count:]
 	return
 }

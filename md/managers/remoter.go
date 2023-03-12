@@ -23,11 +23,7 @@ import (
 )
 
 type (
-	// RemoterManager
-	// 服务端管理器.
 	RemoterManager interface {
-		// Processor
-		// 类进程.
 		Processor() process.Processor
 	}
 

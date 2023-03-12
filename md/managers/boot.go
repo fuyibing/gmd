@@ -23,42 +23,16 @@ import (
 	"sync"
 )
 
-var (
-	// Boot
-	// 根管理器.
-	Boot BootManager
-)
+var Boot BootManager
 
 type (
-	// BootManager
-	// 根管理器接口.
 	BootManager interface {
-		// Consumer
-		// 消费者管理器.
 		Consumer() ConsumerManager
-
-		// Processor
-		// 类进程.
 		Processor() process.Processor
-
-		// Producer
-		// 生产者管理器.
 		Producer() ProducerManager
-
-		// Remoter
-		// 服务端管理器.
 		Remoter() RemoterManager
-
-		// Retry
-		// 重试管理器.
 		Retry() RetryManager
-
-		// Start
-		// 启动管理器.
 		Start(ctx context.Context) error
-
-		// Stop
-		// 退出管理器.
 		Stop()
 	}
 
@@ -91,6 +65,7 @@ func (o *boot) Stop()                           { o.processor.Stop() }
 func (o *boot) onBefore(ctx context.Context) (ignored bool) {
 	span := log.NewSpanFromContext(ctx, "boot.memory.init")
 	defer span.End()
+
 	err := base.Memory.Reload(span.Context())
 	return err != nil
 }

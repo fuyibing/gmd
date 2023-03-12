@@ -23,13 +23,8 @@ import (
 )
 
 var (
-	// Container
-	// 容器实例.
 	Container base.ContainerOperation
-
-	// Manager
-	// 管理器实例.
-	Manager managers.BootManager
+	Manager   managers.BootManager
 )
 
 func init() {
@@ -38,41 +33,49 @@ func init() {
 		Container = base.Container
 
 		// +-------------------------------------------------------------------+
-		// + Adapter for: consumer & producer & remoter                        |
+		// + Adapter: rocketmq/rabbitmq/aliyunmns                              |
+		// +   1. consumer                                                     |
+		// +   2. producer                                                     |
+		// +   3. remoter                                                      |
+		// +-------------------------------------------------------------------+
+		// + Register follow constructors when package initialized             |
 		// +-------------------------------------------------------------------+
 
 		adapter := app.Config.GetAdapter()
 
-		// 1. 消费者.
+		// Register consumer constructor use adapter.
 		if v := builtinConsumer(adapter).New(); v != nil {
 			Container.RegisterConsumer(v)
 		}
 
-		// 2. 生产者.
+		// Register producer constructor use adapter.
 		if v := builtinProducer(adapter).New(); v != nil {
 			Container.RegisterProducer(v)
 		}
 
-		// 3. 服务端.
+		// Register remoter constructor use adapter.
 		if v := builtinRemoter(adapter).New(); v != nil {
 			Container.RegisterRemoter(v)
 		}
 
 		// +-------------------------------------------------------------------+
-		// + Dependency: condition & dispatcher & result                        |
+		// + Utilities and Dependency:                                         |
+		// +   condition                                                       |
+		// +   dispatcher                                                      |
+		// +   result                                                          |
 		// +-------------------------------------------------------------------+
 
-		// 1. 条件校验.
+		// Register builtin conditions.
 		for k, v := range builtinConditions {
 			Container.RegisterCondition(k, v)
 		}
 
-		// 2. 投递消息.
+		// Register builtin dispatchers.
 		for k, v := range builtinDispatchers {
 			Container.RegisterDispatcher(k, v)
 		}
 
-		// 3. 结果校验.
+		// Register builtin result parser.
 		for k, v := range builtinResults {
 			Container.RegisterResult(k, v)
 		}

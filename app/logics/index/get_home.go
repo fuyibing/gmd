@@ -25,18 +25,14 @@ import (
 )
 
 type (
-	// GetHome
-	// 首页逻辑.
 	GetHome struct {
 		response *GetHomeResponse
 	}
 
-	// GetHomeResponse
-	// 首页返回值.
 	GetHomeResponse struct {
-		Service string `json:"service" label:"服务名" mock:"gmd" desc:"例如: GMD"`
-		Started string `json:"started" label:"启动时间" mock:"2023-03-01 09:10:11" desc:"2023-03-01 09:10:11"`
-		Version string `json:"version" label:"版本号" mock:"1.2.3" desc:"例如: 1.2.3"`
+		Service string `json:"service" label:"Service name" mock:"gmd" desc:"Example: GMD"`
+		Started string `json:"started" label:"Started time" mock:"2023-03-01 09:10:11" desc:"Example: 2023-03-01 09:10:11"`
+		Version string `json:"version" label:"Version number" mock:"1.2.3" desc:"Example: 1.2.3"`
 	}
 )
 

@@ -27,33 +27,15 @@ import (
 )
 
 var (
-	// Memory
-	// 内存操作.
 	Memory MemoryOperation
 )
 
 type (
-	// MemoryOperation
-	// 内存操作接口.
 	MemoryOperation interface {
-		// GetRegistry
-		// 读取注册关系.
 		GetRegistry(id int) (registry *Registry, exists bool)
-
-		// GetRegistryByNames
-		// 读取注册关系.
 		GetRegistryByNames(topicName, topicTag string) (registry *Registry, exists bool)
-
-		// GetTask
-		// 读取订阅任务.
 		GetTask(id int) (task *Task, exists bool)
-
-		// GetTasks
-		// 任务列表.
 		GetTasks() (task map[int]*Task)
-
-		// Reload
-		// 重载内存.
 		Reload(ctx context.Context) (err error)
 	}
 

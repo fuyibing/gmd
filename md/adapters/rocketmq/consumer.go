@@ -340,6 +340,7 @@ func (o *Consumer) pipeDelay(ctx context.Context, ext *rmqp.MessageExt) (retry b
 
 func (o *Consumer) pipeHandle(ext *rmqp.MessageExt) (retry bool) {
 	var (
+		err  error
 		span = log.NewSpan("message.received")
 		msg  = base.Pool.AcquireMessage().SetContext(span.Context())
 	)
@@ -375,7 +376,9 @@ func (o *Consumer) pipeHandle(ext *rmqp.MessageExt) (retry bool) {
 	span.Logger().Info("message received: topic-name=%s, topic-tag=%s, message-id=%s, message-delay-ms=%d",
 		ext.Topic, ext.GetTags(),
 		ext.MsgId, span.StartTime().Sub(time.UnixMilli(msg.MessageTime)).Milliseconds())
-	retry, _ = o.handler(o.task, msg)
+	retry, err = o.handler(o.task, msg)
+
+	span.Logger().Info("<%s.%s> message.received.completed: retry=%v, error=%v", o.name, o.key, retry, err)
 	return
 }
 

@@ -35,22 +35,16 @@ func NewMessageService(ss ...*xorm.Session) *MessageService {
 	return o
 }
 
-// AddFailed
-// 添加失败消费.
 func (o *MessageService) AddFailed(req *models.Message) (*models.Message, error) {
 	req.Status = models.StatusFailed
 	return o.add(req)
 }
 
-// AddSucceed
-// 添加成功消费.
 func (o *MessageService) AddSucceed(req *models.Message) (*models.Message, error) {
 	req.Status = models.StatusSucceed
 	return o.add(req)
 }
 
-// GetById
-// 读取一条消息.
 func (o *MessageService) GetById(id int64) (*models.Message, error) {
 	bean := &models.Message{}
 	if exists, err := o.Slave().Where("id = ?", id).Get(bean); err != nil || !exists {
@@ -59,8 +53,6 @@ func (o *MessageService) GetById(id int64) (*models.Message, error) {
 	return bean, nil
 }
 
-// GetByMessageId
-// 读取一条消息.
 func (o *MessageService) GetByMessageId(taskId int, messageId string) (*models.Message, error) {
 	bean := &models.Message{}
 	if exists, err := o.Slave().Where("task_id = ? AND message_id = ?", taskId, messageId).Get(bean); err != nil || !exists {
@@ -69,8 +61,6 @@ func (o *MessageService) GetByMessageId(taskId int, messageId string) (*models.M
 	return bean, nil
 }
 
-// SetStatusAsFailed
-// 设为消费失败.
 func (o *MessageService) SetStatusAsFailed(id int64, duration time.Duration, responseBody string) (int64, error) {
 	return o.Master().Cols("status", "duration", "response_body").
 		Incr("retry").
@@ -78,8 +68,6 @@ func (o *MessageService) SetStatusAsFailed(id int64, duration time.Duration, res
 		Update(&models.Message{Status: models.StatusFailed, Duration: duration.Seconds(), ResponseBody: responseBody})
 }
 
-// SetStatusAsSucceed
-// 设为消费成功.
 func (o *MessageService) SetStatusAsSucceed(id int64, duration time.Duration, responseBody string) (int64, error) {
 	return o.Master().Cols("status", "duration", "response_body").
 		Incr("retry").

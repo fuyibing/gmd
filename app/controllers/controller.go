@@ -22,21 +22,21 @@ import (
 )
 
 // Controller
-// 默认.
+// Default.
 type Controller struct{}
 
 // Get
-// 默认页.
+// Home page.
 //
 // @Response(app/logics/index.GetHomeResponse)
 func (o *Controller) Get(i iris.Context) interface{} {
-	return logics.New(i, index.NewGetHome().Run)
+	return logics.New(i, index.NewGetHome)
 }
 
 // GetPing
-// 健康检查.
+// Health check.
 //
 // @Response(app/logics/index.GetPingResponse)
 func (o *Controller) GetPing(i iris.Context) interface{} {
-	return logics.New(i, index.NewGetPing().Run)
+	return logics.New(i, index.NewGetPing)
 }

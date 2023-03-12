@@ -41,8 +41,6 @@ var (
 )
 
 type (
-	// Datetime
-	// GMT时间.
 	Datetime string
 )
 

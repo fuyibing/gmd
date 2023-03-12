@@ -20,6 +20,7 @@ import (
 	"fmt"
 	cc "github.com/fuyibing/console/v3"
 	cm "github.com/fuyibing/console/v3/managers"
+	"github.com/fuyibing/gdoc/adapters/markdown/i18n"
 	"github.com/fuyibing/gmd/v8/app"
 	"github.com/fuyibing/gmd/v8/app/controllers"
 	"github.com/fuyibing/gmd/v8/app/middlewares"
@@ -36,8 +37,6 @@ var (
 )
 
 type (
-	// GmdApp
-	// 消息分发.
 	GmdApp struct {
 		Cancel         context.CancelFunc
 		ConsoleCommand cm.Command
@@ -58,8 +57,7 @@ func (o *GmdApp) OnInterrupt() {
 		ms  = 100 * time.Millisecond
 	)
 
-	// 待等结束.
-	// 连续 30 秒内, 每隔 100 毫秒检查 MD 是否结束.
+	// Send stop signal then wait all jobs done, force quit if timed out.
 	md.Manager.Stop()
 	for i := 0; i < max; i++ {
 		if md.Manager.Processor().Stopped() {
@@ -78,13 +76,12 @@ func (o *GmdApp) OnStart(_ *iris.Application) {
 }
 
 func (o *GmdApp) Start() {
-	// 处理管理.
-	// - 开始时启动日志.
-	// - 结束前关闭日志.
+	// Start logger/tracer with async mode. Stop and wait done when
+	// service stopped.
 	log.Manager.Start(o.Ctx)
 	defer log.Manager.Stop()
 
-	// 启动服务.
+	// Start service.
 	if err := o.Framework.Configure(o.OnStart).Run(
 		iris.Addr(fmt.Sprintf("%s:%d", app.Config.GetHost(), app.Config.GetPort())),
 	); err != nil {
@@ -153,18 +150,17 @@ func (o *GmdApp) initFramework() {
 }
 
 func (o *GmdApp) initMiddlewares() {
-	// 中间件.
 	for _, middleware := range middlewares.Registry {
 		o.Framework.UseGlobal(middleware)
 	}
-
-	// 错误码.
 	o.Framework.OnAnyErrorCode(middlewares.ErrCode)
 }
 
-func init() { App = (&GmdApp{}).init() }
+func init() {
+	i18n.SetLang(nil)
+	App = (&GmdApp{}).init()
+}
 
 func main() {
-	App.ConsoleManager.RunTerminal()
-	// App.Start()
+	_ = App.ConsoleManager.RunTerminal()
 }

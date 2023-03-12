@@ -16,7 +16,7 @@
 package task
 
 // Controller
-// 订阅任务.
+// Task operation.
 //
 // @RoutePrefix(/task)
 type Controller struct{}

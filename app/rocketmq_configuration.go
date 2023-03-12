@@ -15,8 +15,6 @@
 
 package app
 
-const ()
-
 var (
 	defaultRocketmqPrefix         = "X-"
 	defaultRocketmqTopicQueueNums = 15

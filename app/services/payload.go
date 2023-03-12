@@ -35,29 +35,21 @@ func NewPayloadService(ss ...*xorm.Session) *PayloadService {
 	return o
 }
 
-// AddFailed
-// 添加失败消息.
 func (o *PayloadService) AddFailed(req *models.Payload) (*models.Payload, error) {
 	req.Status = models.StatusFailed
 	return o.add(req)
 }
 
-// AddSucceed
-// 添加成功消息.
 func (o *PayloadService) AddSucceed(req *models.Payload) (*models.Payload, error) {
 	req.Status = models.StatusSucceed
 	return o.add(req)
 }
 
-// AddWaiting
-// 添加重试消息.
 func (o *PayloadService) AddWaiting(req *models.Payload) (*models.Payload, error) {
 	req.Status = models.StatusWaiting
 	return o.add(req)
 }
 
-// GetByHash
-// 读取一条消息.
 func (o *PayloadService) GetByHash(hash string, offset int) (*models.Payload, error) {
 	bean := &models.Payload{}
 	if exists, err := o.Slave().Where("hash = ? AND offset = ?", hash, offset).Get(bean); err != nil || !exists {
@@ -66,8 +58,6 @@ func (o *PayloadService) GetByHash(hash string, offset int) (*models.Payload, er
 	return bean, nil
 }
 
-// GetById
-// 读取一条消息.
 func (o *PayloadService) GetById(id int64) (*models.Payload, error) {
 	bean := &models.Payload{}
 	if exists, err := o.Slave().Where("id = ?", id).Get(bean); err != nil || !exists {
@@ -76,8 +66,6 @@ func (o *PayloadService) GetById(id int64) (*models.Payload, error) {
 	return bean, nil
 }
 
-// SetStatusAsFailed
-// 设为发布失败.
 func (o *PayloadService) SetStatusAsFailed(id int64, duration time.Duration, responseBody string) (int64, error) {
 	return o.Master().Cols("status", "duration", "response_body").
 		Incr("retry").
@@ -85,8 +73,6 @@ func (o *PayloadService) SetStatusAsFailed(id int64, duration time.Duration, res
 		Update(&models.Payload{Status: models.StatusFailed, Duration: duration.Seconds(), ResponseBody: responseBody})
 }
 
-// SetStatusAsSucceed
-// 设为发布成功.
 func (o *PayloadService) SetStatusAsSucceed(id int64, duration time.Duration, messageId string) (int64, error) {
 	return o.Master().Cols("status", "duration", "message_id", "response_body").
 		Incr("retry").
@@ -98,8 +84,6 @@ func (o *PayloadService) SetStatusAsSucceed(id int64, duration time.Duration, me
 		})
 }
 
-// SetStatusAsWaiting
-// 设为待重试.
 func (o *PayloadService) SetStatusAsWaiting(id int64, duration time.Duration, responseBody string) (int64, error) {
 	return o.Master().Cols("status", "duration", "response_body").
 		Incr("retry").

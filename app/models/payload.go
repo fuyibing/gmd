@@ -16,8 +16,6 @@
 package models
 
 type (
-	// Payload
-	// 生产消息.
 	Payload struct {
 		Id       int64   `xorm:"id pk autoincr"`
 		Status   int     `xorm:"status"`

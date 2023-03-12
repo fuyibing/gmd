@@ -17,8 +17,11 @@ package managers
 
 import (
 	"context"
+	"github.com/fuyibing/gmd/v8/app"
 	"github.com/fuyibing/log/v5"
 	"github.com/fuyibing/util/v8/process"
+	"sync"
+	"time"
 )
 
 type (
@@ -31,8 +34,13 @@ type (
 	}
 
 	retry struct {
+		sync.RWMutex
+
 		name      string
 		processor process.Processor
+
+		consuming,
+		publishing bool
 	}
 )
 
@@ -42,9 +50,31 @@ func (o *retry) Processor() process.Processor { return o.processor }
 // + Event methods                                                             |
 // +---------------------------------------------------------------------------+
 
+// consumeMessage
+// 消费消息.
+func (o *retry) consumeMessage() {
+}
+
+// publishPayload
+// 发布消息.
+func (o *retry) publishPayload() {
+}
+
+// onCall
+// 监听信号.
 func (o *retry) onCall(ctx context.Context) (ignored bool) {
+	dc := time.Duration(app.Config.GetConsumer().GetRetryFrequency()) * time.Second
+	tc := time.NewTimer(dc)
+
+	dp := time.Duration(app.Config.GetProducer().GetRetryFrequency()) * time.Second
+	tp := time.NewTicker(dp)
+
 	for {
 		select {
+		case <-tc.C:
+			go o.consumeMessage()
+		case <-tp.C:
+			go o.publishPayload()
 		case <-ctx.Done():
 			return
 		}

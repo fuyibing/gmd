@@ -34,8 +34,6 @@ func NewRegistryService(ss ...*xorm.Session) *RegistryService {
 	return o
 }
 
-// ListAll
-// 注册关系列表.
 func (o *RegistryService) ListAll() (list []*models.Registry, err error) {
 	list = make([]*models.Registry, 0)
 	err = o.Slave().Find(&list)

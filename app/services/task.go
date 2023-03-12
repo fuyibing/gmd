@@ -34,8 +34,6 @@ func NewTaskService(ss ...*xorm.Session) *TaskService {
 	return o
 }
 
-// ListEnables
-// 启用任务列表.
 func (o *TaskService) ListEnables() (list []*models.Task, err error) {
 	list = make([]*models.Task, 0)
 	err = o.Slave().Where("status = ?", models.StatusEnabled).Find(&list)

@@ -19,6 +19,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/fuyibing/gmd/v8/app"
+	"github.com/fuyibing/gmd/v8/app/logics"
 	"github.com/fuyibing/gmd/v8/md"
 	"github.com/fuyibing/gmd/v8/md/base"
 	"github.com/fuyibing/log/v5/tracers"
@@ -52,7 +53,7 @@ type (
 	}
 )
 
-func NewPostPublish() *PostPublish {
+func NewPostPublish() logics.LogicHandler {
 	return &PostPublish{
 		request:  &PostPublishRequest{},
 		response: &PostPublishResponse{},
@@ -62,6 +63,8 @@ func NewPostPublish() *PostPublish {
 // +---------------------------------------------------------------------------+
 // + Logic runner                                                              |
 // +---------------------------------------------------------------------------+
+
+func (o *PostPublish) Release() {}
 
 func (o *PostPublish) Run(span tracers.Span, i iris.Context) (res interface{}) {
 	var (

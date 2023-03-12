@@ -22,14 +22,11 @@ import (
 	"net/http"
 )
 
-// ErrCode
-// 处理错误码.
 func ErrCode(i iris.Context) {
 	sendError(i, i.GetStatusCode(), nil)
 	i.Next()
 }
 
-// 发送错误.
 func sendError(i iris.Context, code int, v interface{}) {
 	var err error
 	if v != nil {
@@ -38,6 +35,5 @@ func sendError(i iris.Context, code int, v interface{}) {
 		err = fmt.Errorf("HTTP %d %s", code, http.StatusText(code))
 	}
 
-	// 发送内容.
 	_, _ = i.JSON(response.With.ErrorCode(err, code))
 }

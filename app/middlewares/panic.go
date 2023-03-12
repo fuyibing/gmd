@@ -20,18 +20,14 @@ import (
 	"net/http"
 )
 
-// Panic
-// 捕获异常.
 func Panic(i iris.Context) {
 	defer func() {
 		v := recover()
 
-		// 取消处理.
 		if v == nil || i.IsStopped() {
 			return
 		}
 
-		// 发送错误.
 		sendError(i, http.StatusInternalServerError, v)
 	}()
 

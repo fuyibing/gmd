@@ -16,8 +16,6 @@
 package models
 
 type (
-	// Registry
-	// 注册关系.
 	Registry struct {
 		Id int `xorm:"id pk autoincr"`
 

@@ -16,6 +16,7 @@
 package index
 
 import (
+	"github.com/fuyibing/gmd/v8/app/logics"
 	"github.com/fuyibing/log/v5/tracers"
 	"github.com/fuyibing/util/v8/web/response"
 	"github.com/kataras/iris/v12"
@@ -32,11 +33,13 @@ type (
 	}
 )
 
-func NewGetPing() *GetPing {
+func NewGetPing() logics.LogicHandler {
 	return &GetPing{
 		response: &GetPingResponse{},
 	}
 }
+
+func (o *GetPing) Release() {}
 
 func (o *GetPing) Run(span tracers.Span, i iris.Context) interface{} {
 

@@ -16,8 +16,6 @@
 package models
 
 type (
-	// Message
-	// 队列消息.
 	Message struct {
 		Id       int64   `xorm:"id pk autoincr"`
 		Status   int     `xorm:"status"`

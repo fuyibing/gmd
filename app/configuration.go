@@ -33,8 +33,6 @@ const (
 )
 
 type (
-	// Configuration
-	// 全局配置.
 	Configuration interface {
 		GetHost() string
 		GetName() string

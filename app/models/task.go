@@ -16,8 +16,6 @@
 package models
 
 type (
-	// Task
-	// 订阅任务.
 	Task struct {
 		Id         int `xorm:"id pk autoincr"`
 		RegistryId int `xorm:"registry_id"`

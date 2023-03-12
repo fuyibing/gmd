@@ -22,27 +22,25 @@ import (
 )
 
 // Controller
-// 主题操作.
+// Topic operations.
 //
 // @RoutePrefix(/topic)
 type Controller struct{}
 
-// func (o *Controller) PostBatch(i iris.Context) interface{} {}
-
 // PostBatch
-// 批量发布.
+// Batch publish.
 //
 // @Request(app/logics/topic.PostBatchRequest)
 // @Response(app/logics/topic.PostBatchResponse)
 func (o *Controller) PostBatch(i iris.Context) interface{} {
-	return logics.New(i, topic.NewPostBatch().Run)
+	return logics.New(i, topic.NewPostBatch)
 }
 
 // PostPublish
-// 发布消息.
+// Publish one message.
 //
 // @Request(app/logics/topic.PostPublishRequest)
 // @Response(app/logics/topic.PostPublishResponse)
 func (o *Controller) PostPublish(i iris.Context) interface{} {
-	return logics.New(i, topic.NewPostPublish().Run)
+	return logics.New(i, topic.NewPostPublish)
 }

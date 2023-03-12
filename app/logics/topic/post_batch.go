@@ -19,6 +19,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/fuyibing/gmd/v8/app"
+	"github.com/fuyibing/gmd/v8/app/logics"
 	"github.com/fuyibing/gmd/v8/md"
 	"github.com/fuyibing/gmd/v8/md/base"
 	"github.com/fuyibing/log/v5"
@@ -55,7 +56,7 @@ type (
 	}
 )
 
-func NewPostBatch() *PostBatch {
+func NewPostBatch() logics.LogicHandler {
 	return &PostBatch{
 		request:  &PostBatchRequest{},
 		response: &PostBatchResponse{},
@@ -65,6 +66,8 @@ func NewPostBatch() *PostBatch {
 // +---------------------------------------------------------------------------+
 // + Logic runner                                                              |
 // +---------------------------------------------------------------------------+
+
+func (o *PostBatch) Release() {}
 
 func (o *PostBatch) Run(span tracers.Span, i iris.Context) (res interface{}) {
 	var (

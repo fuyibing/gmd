@@ -22,8 +22,6 @@ import (
 )
 
 var (
-	// Registry
-	// 控制器注册中心.
 	Registry map[string]interface{}
 )
 

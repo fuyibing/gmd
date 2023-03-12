@@ -29,44 +29,57 @@ import (
 
 type (
 	// Logic
-	// 逻辑回调.
-	Logic func(span tracers.Span, i iris.Context) interface{}
+	// get instance from pool.
+	Logic func() LogicHandler
+
+	// LogicHandler
+	// instance for api request.
+	LogicHandler interface {
+		// Release
+		// instance into pool.
+		Release()
+
+		// Run
+		// logic executor.
+		Run(span tracers.Span, i iris.Context) interface{}
+	}
 )
 
 // New
-// 执行逻辑.
+// get logic instance from pool then run it, release when executed
+// completed.
 func New(i iris.Context, logics ...Logic) (res interface{}) {
 	var (
 		req = i.Request()
 
-		// 链路追踪.
+		// Create tracer span from http request.
 		span = log.NewSpanFromRequest(i.Request(),
 			fmt.Sprintf("%s %s", req.Method, req.URL.Path),
 		)
 	)
 
-	// 结束请求.
+	// End request.
 	defer func() {
-		// 捕获异常.
+		// Recover runtime fatal.
 		if r := recover(); r != nil {
 			span.Logger().Fatal("http request fatal: %v", r)
 			res = response.With.ErrorCode(fmt.Errorf("%v", r), app.CodePanicOccurred)
 		}
 
-		// 记录结果.
+		// Store request result.
 		buf, _ := json.Marshal(res)
 		span.Logger().Info("http request end: %s", buf)
 
-		// 结束链路.
+		// End span then call next middlewares.
 		span.End()
 		i.Next()
 	}()
 
-	// 请求开始.
+	// Begin request.
 	func() {
 		span.Logger().Info("http request begin: %s %s %s", req.Proto, req.Method, req.RequestURI)
 
-		// 记录入参.
+		// Store request body.
 		switch i.Request().Method {
 		case http.MethodPost, http.MethodPut:
 			if b, be := i.GetBody(); be == nil {
@@ -77,14 +90,13 @@ func New(i iris.Context, logics ...Logic) (res interface{}) {
 		}
 	}()
 
-	// 请求过程.
+	// Return error if logic not specified.
 	if len(logics) == 0 {
-		res = response.With.ErrorCode(
-			fmt.Errorf("logic not specified"),
-			app.CodeLogicUndefined,
-		)
-	} else {
-		res = logics[0](span, i)
+		res = response.With.ErrorCode(fmt.Errorf("logic not specified"), app.CodeLogicUndefined)
+		return
 	}
+
+	// Return logic processor result.
+	res = logics[0]().Run(span, i)
 	return
 }

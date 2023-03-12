@@ -17,6 +17,7 @@ package index
 
 import (
 	"github.com/fuyibing/gmd/v8/app"
+	"github.com/fuyibing/gmd/v8/app/logics"
 	"github.com/fuyibing/gmd/v8/app/models"
 	"github.com/fuyibing/log/v5/tracers"
 	"github.com/fuyibing/util/v8/web/response"
@@ -39,11 +40,13 @@ type (
 	}
 )
 
-func NewGetHome() *GetHome {
+func NewGetHome() logics.LogicHandler {
 	return &GetHome{
 		response: &GetHomeResponse{},
 	}
 }
+
+func (o *GetHome) Release() {}
 
 func (o *GetHome) Run(_ tracers.Span, _ iris.Context) interface{} {
 	o.response.Service = app.Config.GetName()

@@ -25,7 +25,10 @@ const (
 	defaultProducerBucketConcurrency = 50
 	defaultProducerBucketFrequency   = 200
 
-	defaultProducerMaxRetry = 30
+	defaultProducerRetryFrequency = 60
+	defaultProducerRetryLimit     = 30
+	defaultProducerMaxRetry       = 30
+	defaultProducerTimeout        = 10
 
 	defaultProducerNotifyTagFailed  = "FAILED"
 	defaultProducerNotifyTagSucceed = "SUCCEED"
@@ -46,6 +49,8 @@ type (
 		GetNotifyTagFailed() string
 		GetNotifyTagSucceed() string
 		GetNotifyTopic() string
+		GetRetryFrequency() int
+		GetRetryLimit() int
 		GetSaveFailed() bool
 		GetSaveSucceed() bool
 		GetTimeout() int
@@ -57,10 +62,32 @@ type (
 		BucketBatch       int   `yaml:"bucket-batch" json:"bucket_batch"`
 		BucketFrequency   int   `yaml:"bucket-frequency" json:"bucket_frequency"`
 
-		MaxRetry    int   `yaml:"max-retry" json:"max_retry"`
-		SaveFailed  *bool `yaml:"save-failed" json:"save_failed"`
+		// How often to check whether the payload in the database needs
+		// to be retried.
+		//
+		// Default: 60 (Second)
+		RetryFrequency int `yaml:"retry-frequency" json:"retry_frequency"`
+
+		// How many payloads are read from the database when retrying
+		// again.
+		//
+		// Default: 30
+		RetryLimit int `yaml:"retry-limit" json:"retry_limit"`
+
+		// Maximum number of retries allowed if message publishing fails.
+		MaxRetry int `yaml:"max-retry" json:"max_retry"`
+
+		// If no result is returned within the specified time when publishing
+		// a message, it will be deemed as failure.
+		//
+		// Default: 10 (Second)
+		Timeout int `yaml:"timeout" json:"timeout"`
+
+		// Whether to save the failed payload to the database.
+		SaveFailed *bool `yaml:"save-failed" json:"save_failed"`
+
+		// Whether to save the succeed payload to the database.
 		SaveSucceed *bool `yaml:"save-succeed" json:"save_succeed"`
-		Timeout     int   `yaml:"timeout" json:"timeout"`
 
 		NotifyTagFailed  string `yaml:"notify-tag-failed" json:"notify_tag_failed"`
 		NotifyTagSucceed string `yaml:"notify-tag-succeed" json:"notify_tag_succeed"`
@@ -79,6 +106,8 @@ func (o *producerConfiguration) GetBucketCapacity() int      { return o.BucketCa
 func (o *producerConfiguration) GetBucketConcurrency() int32 { return o.BucketConcurrency }
 func (o *producerConfiguration) GetBucketFrequency() int     { return o.BucketFrequency }
 func (o *producerConfiguration) GetMaxRetry() int            { return o.MaxRetry }
+func (o *producerConfiguration) GetRetryFrequency() int      { return o.RetryFrequency }
+func (o *producerConfiguration) GetRetryLimit() int          { return o.RetryLimit }
 func (o *producerConfiguration) GetNotifyTagFailed() string  { return o.NotifyTagFailed }
 func (o *producerConfiguration) GetNotifyTagSucceed() string { return o.NotifyTagSucceed }
 func (o *producerConfiguration) GetNotifyTopic() string      { return o.NotifyTopic }
@@ -113,8 +142,19 @@ func (o *producerConfiguration) initDefaults() *producerConfiguration {
 		o.SaveSucceed = &yes
 	}
 
+	if o.RetryFrequency == 0 {
+		o.RetryFrequency = defaultProducerRetryFrequency
+	}
+	if o.RetryLimit == 0 {
+		o.RetryLimit = defaultProducerRetryLimit
+	}
+
 	if o.MaxRetry == 0 {
 		o.MaxRetry = defaultProducerMaxRetry
+	}
+
+	if o.Timeout == 0 {
+		o.Timeout = defaultProducerTimeout
 	}
 
 	if o.NotifyTagFailed == "" {
